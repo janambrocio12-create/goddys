@@ -27,6 +27,8 @@ export type InventoryMovementType =
 
 export interface Address {
   label?: string;
+  full_name: string;
+  phone: string;
   line1: string;
   line2?: string;
   city: string;

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Archivo_Black, Inter, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 
-// Display face used with restraint (wordmark, hero numerals) - a
+// Display face used with restraint (wordmark, hero numerals) — a
 // condensed, heavyweight grotesk for editorial impact.
 const displayFont = Archivo_Black({
   subsets: ['latin'],
@@ -10,7 +10,7 @@ const displayFont = Archivo_Black({
   variable: '--font-display',
 });
 
-// Body face - a plain, high-legibility grotesk that stays out of the way.
+// Body face — a plain, high-legibility grotesk that stays out of the way.
 const bodyFont = Inter({
   subsets: ['latin'],
   variable: '--font-body',
@@ -26,9 +26,9 @@ const monoFont = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'GODDYS',
-    template: '%s - GODDYS',
+    template: '%s — GODDYS',
   },
-  description: 'GODDYS - premium streetwear,underground.',
+  description: 'GODDYS — premium streetwear, built underground.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

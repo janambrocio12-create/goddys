@@ -11,6 +11,9 @@ function AddressBlock({ address, label }: { address: Address | null; label: stri
     <div>
       <p className="font-mono text-xs uppercase tracking-widest text-concrete">{label}</p>
       <p className="mt-2 text-sm">
+        {address.full_name}
+        {address.phone ? ` · ${address.phone}` : ''}
+        <br />
         {address.line1}
         {address.line2 ? `, ${address.line2}` : ''}
         <br />

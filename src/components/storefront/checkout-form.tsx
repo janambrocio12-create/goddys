@@ -7,6 +7,8 @@ import { formatMoney } from '@/lib/format';
 import { placeOrder, type CheckoutAddressInput } from '@/app/(storefront)/checkout/actions';
 
 const EMPTY_ADDRESS: CheckoutAddressInput = {
+  full_name: '',
+  phone: '',
   line1: '',
   line2: '',
   city: '',
@@ -15,10 +17,20 @@ const EMPTY_ADDRESS: CheckoutAddressInput = {
   country: 'Philippines',
 };
 
-export function CheckoutForm() {
+export function CheckoutForm({
+  initialFullName,
+  initialPhone,
+}: {
+  initialFullName?: string;
+  initialPhone?: string;
+}) {
   const router = useRouter();
   const { items, subtotal, clear } = useCart();
-  const [address, setAddress] = useState<CheckoutAddressInput>(EMPTY_ADDRESS);
+  const [address, setAddress] = useState<CheckoutAddressInput>({
+    ...EMPTY_ADDRESS,
+    full_name: initialFullName ?? '',
+    phone: initialPhone ?? '',
+  });
   const [discountCode, setDiscountCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -58,6 +70,33 @@ export function CheckoutForm() {
         <p className="font-mono text-xs uppercase tracking-widest text-concrete">
           Shipping address
         </p>
+
+        <div className="grid grid-cols-2 gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="font-mono text-xs uppercase tracking-wide text-concrete">
+              Full name
+            </span>
+            <input
+              required
+              value={address.full_name}
+              onChange={(e) => setAddress((a) => ({ ...a, full_name: e.target.value }))}
+              className="border border-concrete/40 bg-panel px-3 py-2 text-sm text-bone outline-none focus-visible:border-hazard"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="font-mono text-xs uppercase tracking-wide text-concrete">
+              Phone number
+            </span>
+            <input
+              type="tel"
+              required
+              value={address.phone}
+              onChange={(e) => setAddress((a) => ({ ...a, phone: e.target.value }))}
+              placeholder="09XX XXX XXXX"
+              className="border border-concrete/40 bg-panel px-3 py-2 text-sm text-bone outline-none focus-visible:border-hazard"
+            />
+          </label>
+        </div>
 
         <label className="flex flex-col gap-1.5">
           <span className="font-mono text-xs uppercase tracking-wide text-concrete">

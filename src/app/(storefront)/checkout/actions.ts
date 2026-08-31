@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 export type CheckoutItemInput = { variantId: string; quantity: number };
 
 export type CheckoutAddressInput = {
+  full_name: string;
+  phone: string;
   line1: string;
   line2?: string;
   city: string;

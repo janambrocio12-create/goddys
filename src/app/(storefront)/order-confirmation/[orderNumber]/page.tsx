@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { formatMoney } from '@/lib/format';
+import type { Address } from '@/lib/types/database.types';
 
 export default async function OrderConfirmationPage({
   params,
@@ -24,6 +25,8 @@ export default async function OrderConfirmationPage({
     .select('*')
     .eq('order_id', order.id);
 
+  const shippingAddress = order.shipping_address as Address;
+
   return (
     <div className="mx-auto max-w-xl px-6 py-16 md:px-10">
       <p className="font-mono text-xs uppercase tracking-widest text-hazard">Order placed</p>
@@ -34,6 +37,20 @@ export default async function OrderConfirmationPage({
         We will reach out to arrange payment and confirm shipping. Keep your order
         number for reference.
       </p>
+
+      <div className="mt-8 border-t border-concrete/20 pt-6">
+        <p className="font-mono text-xs uppercase tracking-widest text-concrete">Shipping to</p>
+        <p className="mt-2 text-sm">
+          {shippingAddress.full_name} · {shippingAddress.phone}
+          <br />
+          {shippingAddress.line1}
+          {shippingAddress.line2 ? `, ${shippingAddress.line2}` : ''}
+          <br />
+          {shippingAddress.city}, {shippingAddress.province} {shippingAddress.postal_code}
+          <br />
+          {shippingAddress.country}
+        </p>
+      </div>
 
       <div className="mt-8 flex flex-col gap-3 border-t border-concrete/20 pt-6">
         {(items ?? []).map((item) => {
