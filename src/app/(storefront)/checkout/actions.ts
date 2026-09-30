@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import type { PaymentMethod } from '@/lib/types/database.types';
 
 export type CheckoutItemInput = { variantId: string; quantity: number };
 
@@ -23,6 +24,8 @@ export async function placeOrder(
   items: CheckoutItemInput[],
   shippingAddress: CheckoutAddressInput,
   discountCode: string,
+  paymentMethod: PaymentMethod,
+  paymentReference: string,
 ): Promise<PlaceOrderResult> {
   const supabase = createClient();
 
@@ -38,11 +41,17 @@ export async function placeOrder(
     return { success: false, error: 'Your cart is empty.' };
   }
 
+  if (paymentMethod === 'gcash_manual' && paymentReference.trim().length === 0) {
+    return { success: false, error: 'Enter your GCash reference number to continue.' };
+  }
+
   const { data, error } = await supabase.rpc('create_order', {
     p_shipping_address: shippingAddress,
     p_billing_address: null,
     p_discount_code: discountCode.trim() || null,
     p_items: items.map((i) => ({ variant_id: i.variantId, quantity: i.quantity })),
+    p_payment_method: paymentMethod,
+    p_payment_reference: paymentReference.trim() || null,
   });
 
   if (error) {

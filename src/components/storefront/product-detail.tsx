@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useCart } from '@/lib/cart/cart-context';
 import { formatMoney } from '@/lib/format';
 import type { Database } from '@/lib/types/database.types';
@@ -56,12 +56,30 @@ export function ProductDetail({
   const [quantity, setQuantity] = useState(1);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const galleryImages = useMemo(
     () => images.filter((img) => !img.variant_id || img.variant_id === selectedVariant?.id),
     [images, selectedVariant],
   );
   const activeImage = galleryImages[activeImageIndex] ?? galleryImages[0];
+
+  useEffect(() => {
+    if (!isZoomOpen) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsZoomOpen(false);
+      if (event.key === 'ArrowRight') {
+        setActiveImageIndex((i) => (i + 1) % Math.max(galleryImages.length, 1));
+      }
+      if (event.key === 'ArrowLeft') {
+        setActiveImageIndex(
+          (i) => (i - 1 + Math.max(galleryImages.length, 1)) % Math.max(galleryImages.length, 1),
+        );
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isZoomOpen, galleryImages.length]);
 
   function handleSizeChange(size: string) {
     setSelectedSize(size);
@@ -98,17 +116,31 @@ export function ProductDetail({
       },
       quantity,
     );
-    setFeedback('Added to cart.');
+    setFeedback('In the bag.');
   }
 
   return (
     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-10 md:grid-cols-2 md:px-10">
       <div>
-        <div className="aspect-square w-full overflow-hidden bg-panel">
+        <div className="relative aspect-square w-full overflow-hidden bg-panel">
           {activeImage ? (
-            // eslint-disable-next-line @next/next/no-img-element -- arbitrary
-            // external URLs (Cloudinary or pasted) at this stage.
-            <img src={activeImage.url} alt={activeImage.alt_text ?? product.name} className="h-full w-full object-cover" />
+            <button
+              type="button"
+              onClick={() => setIsZoomOpen(true)}
+              className="block h-full w-full cursor-zoom-in"
+              aria-label="Zoom in on this image"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary
+              external URLs (Cloudinary or pasted) at this stage. */}
+              <img
+                src={activeImage.url}
+                alt={activeImage.alt_text ?? product.name}
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute bottom-3 right-3 bg-ink/70 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-bone">
+                Zoom
+              </span>
+            </button>
           ) : (
             <div className="flex h-full w-full items-center justify-center font-mono text-[10px] uppercase tracking-widest text-concrete">
               No image
@@ -231,6 +263,56 @@ export function ProductDetail({
 
         {feedback && <p className="mt-3 font-mono text-xs text-hazard">{feedback}</p>}
       </div>
+
+      {isZoomOpen && activeImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsZoomOpen(false)}
+            className="absolute right-4 top-4 font-mono text-xs uppercase tracking-widest text-bone hover:text-hazard"
+          >
+            Close ✕
+          </button>
+
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length);
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 px-3 py-4 font-display text-3xl text-bone hover:text-hazard md:left-6"
+                aria-label="Previous image"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIndex((i) => (i + 1) % galleryImages.length);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-4 font-display text-3xl text-bone hover:text-hazard md:right-6"
+                aria-label="Next image"
+              >
+                ›
+              </button>
+            </>
+          )}
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={activeImage.url}
+            alt={activeImage.alt_text ?? product.name}
+            className="max-h-[90vh] max-w-full cursor-zoom-out object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -13,8 +13,8 @@ export default function SizeGuidePage() {
 
       <p className="mt-6 text-sm text-concrete">
         Measurements in centimeters, taken flat. Most GODDYS pieces run
-        oversized by design — if you are between sizes, size down for a
-        closer fit.
+        oversized by design - that is the fit, not a mistake. Between sizes?
+        Size down for something closer.
       </p>
 
       <div className="mt-8 overflow-x-auto border border-concrete/20">

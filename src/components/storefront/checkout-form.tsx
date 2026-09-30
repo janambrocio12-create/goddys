@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart/cart-context';
 import { formatMoney } from '@/lib/format';
 import { placeOrder, type CheckoutAddressInput } from '@/app/(storefront)/checkout/actions';
+import type { PaymentMethod } from '@/lib/types/database.types';
+
+// No payment gateway account yet, so this is the interim setup: cash on
+// delivery, or a manual GCash transfer the client verifies by eye.
+// Replace these with the real GCash number and account name before launch.
+const GCASH_NUMBER = '09XX XXX XXXX';
+const GCASH_ACCOUNT_NAME = 'GODDYS PH (placeholder - swap in the real name)';
 
 const EMPTY_ADDRESS: CheckoutAddressInput = {
   full_name: '',
@@ -32,13 +39,15 @@ export function CheckoutForm({
     phone: initialPhone ?? '',
   });
   const [discountCode, setDiscountCode] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
+  const [paymentReference, setPaymentReference] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   if (items.length === 0) {
     return (
       <p className="mt-10 text-sm text-concrete">
-        Your cart is empty — add something from the shop before checking out.
+        Your cart is empty - go grab something from the shop before you check out.
       </p>
     );
   }
@@ -47,11 +56,18 @@ export function CheckoutForm({
     event.preventDefault();
     setError(null);
 
+    if (paymentMethod === 'gcash_manual' && paymentReference.trim().length === 0) {
+      setError('Enter your GCash reference number to continue.');
+      return;
+    }
+
     startTransition(async () => {
       const result = await placeOrder(
         items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
         address,
         discountCode,
+        paymentMethod,
+        paymentReference,
       );
 
       if (!result.success) {
@@ -180,6 +196,61 @@ export function CheckoutForm({
           />
         </label>
 
+        <div className="mt-2 flex flex-col gap-3 border-t border-concrete/20 pt-4">
+          <p className="font-mono text-xs uppercase tracking-widest text-concrete">Payment</p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cod')}
+              className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
+                paymentMethod === 'cod'
+                  ? 'border-bone bg-bone text-ink'
+                  : 'border-concrete/40 text-bone hover:border-bone'
+              }`}
+            >
+              Cash on delivery
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('gcash_manual')}
+              className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
+                paymentMethod === 'gcash_manual'
+                  ? 'border-bone bg-bone text-ink'
+                  : 'border-concrete/40 text-bone hover:border-bone'
+              }`}
+            >
+              GCash
+            </button>
+          </div>
+
+          {paymentMethod === 'gcash_manual' && (
+            <div className="flex flex-col gap-3 border border-hazard/40 bg-panel p-4">
+              <p className="text-sm text-bone">
+                Send the total below to GCash, then drop the reference number here so we
+                can confirm it and get your order moving.
+              </p>
+              <p className="font-mono text-xs text-concrete">
+                GCash number: <span className="text-hazard">{GCASH_NUMBER}</span>
+                <br />
+                Account name: <span className="text-hazard">{GCASH_ACCOUNT_NAME}</span>
+              </p>
+              <label className="flex flex-col gap-1.5">
+                <span className="font-mono text-xs uppercase tracking-wide text-concrete">
+                  GCash reference number
+                </span>
+                <input
+                  required
+                  value={paymentReference}
+                  onChange={(e) => setPaymentReference(e.target.value)}
+                  placeholder="e.g. 0123456789012"
+                  className="border border-concrete/40 bg-ink px-3 py-2 text-sm text-bone outline-none focus-visible:border-hazard"
+                />
+              </label>
+            </div>
+          )}
+        </div>
+
         {error && (
           <p role="alert" className="font-mono text-xs text-danger">
             {error}
@@ -191,12 +262,13 @@ export function CheckoutForm({
           disabled={isPending}
           className="mt-2 bg-bone py-3 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {isPending ? 'Placing order…' : 'Place order'}
+          {isPending ? 'Placing order...' : 'Place order'}
         </button>
 
         <p className="font-mono text-[10px] uppercase tracking-wide text-concrete">
-          Payment is not collected online yet — we will follow up to arrange payment
-          after you order.
+          {paymentMethod === 'gcash_manual'
+            ? 'We will check your GCash reference and confirm before your order ships.'
+            : 'Cash on delivery - have exact change ready when it lands.'}
         </p>
       </form>
 

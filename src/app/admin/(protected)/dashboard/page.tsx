@@ -21,8 +21,7 @@ export default async function AdminDashboardPage() {
     <div>
       <h1 className="font-display text-2xl tracking-tightest">Dashboard</h1>
       <p className="mt-1 text-sm text-concrete">
-        Foundation build — this reads live counts from Supabase to confirm the
-        schema, RLS, and admin session are wired correctly.
+        Live counts pulled straight from Supabase.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">

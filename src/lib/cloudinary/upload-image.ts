@@ -36,7 +36,7 @@ export async function uploadImageToCloudinary(file: File): Promise<CloudinaryUpl
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    throw new Error('That image is larger than 10MB — choose a smaller file.');
+    throw new Error('That image is larger than 10MB - choose a smaller file.');
   }
 
   const formData = new FormData();

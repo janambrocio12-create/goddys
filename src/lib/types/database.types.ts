@@ -15,6 +15,7 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded';
 export type PaymentStatus = 'unpaid' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
+export type PaymentMethod = 'cod' | 'gcash_manual';
 export type AdminRole = 'super_admin' | 'admin' | 'manager' | 'staff';
 export type DiscountType = 'percentage' | 'fixed_amount';
 export type InventoryMovementType =
@@ -231,6 +232,8 @@ export interface Database {
           total_amount: number;
           shipping_address: Address;
           billing_address: Address | null;
+          payment_method: PaymentMethod;
+          payment_reference: string | null;
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -350,6 +353,8 @@ export interface Database {
           p_billing_address: Address | null;
           p_discount_code: string | null;
           p_items: { variant_id: string; quantity: number }[];
+          p_payment_method?: PaymentMethod;
+          p_payment_reference?: string | null;
         };
         Returns: { order_id: string; order_number: string }[];
       };
@@ -362,6 +367,7 @@ export interface Database {
       admin_role: AdminRole;
       discount_type: DiscountType;
       inventory_movement_type: InventoryMovementType;
+      payment_method: PaymentMethod;
     };
   };
 }

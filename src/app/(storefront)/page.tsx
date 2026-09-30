@@ -16,7 +16,7 @@ export default function HomePage() {
 
       <div className="relative mx-auto w-full max-w-7xl">
         <p className="font-mono text-xs uppercase tracking-widest text-hazard">
-          Built different — Bataan
+          Built different - Bataan
         </p>
 
         <h1 className="mt-4 font-display text-[clamp(3rem,14vw,8rem)] leading-[0.85] tracking-tightest drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
@@ -24,7 +24,7 @@ export default function HomePage() {
         </h1>
 
         <p className="mt-6 max-w-md font-body text-sm text-bone md:text-base">
-          Loyalty over hype — heavyweight tees, built different.
+          Loyalty over hype - heavyweight fits, no cap.
         </p>
 
         <p className="mt-3 font-mono text-xs uppercase tracking-widest text-concrete">

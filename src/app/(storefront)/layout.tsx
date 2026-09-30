@@ -27,7 +27,12 @@ export default async function StorefrontLayout({ children }: { children: React.R
               <CartBadge />
             </Link>
             {user ? (
-              <LogoutButton className="hover:text-bone" />
+              <>
+                <Link href="/account/orders" className="hover:text-bone">
+                  Orders
+                </Link>
+                <LogoutButton className="hover:text-bone" />
+              </>
             ) : (
               <Link href="/account/login" className="hover:text-bone">
                 Account

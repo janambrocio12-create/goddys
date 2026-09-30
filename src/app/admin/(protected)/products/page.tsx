@@ -83,7 +83,7 @@ export default async function ProductsListPage() {
                       <p className="font-mono text-xs text-concrete">{product.sku}</p>
                     </td>
                     <td className="px-4 py-3 text-concrete">
-                      {(product.categories as { name: string } | null)?.name ?? '—'}
+                      {(product.categories as { name: string } | null)?.name ?? '-'}
                     </td>
                     <td className="px-4 py-3">
                       {product.sale_price ? (

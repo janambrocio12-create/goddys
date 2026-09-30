@@ -26,9 +26,9 @@ const monoFont = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'GODDYS',
-    template: '%s — GODDYS',
+    template: '%s - GODDYS',
   },
-  description: 'GODDYS — premium streetwear, built underground.',
+  description: 'GODDYS - premium streetwear built underground. Heavyweight tees, no filler drops.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

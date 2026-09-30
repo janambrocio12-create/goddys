@@ -27,16 +27,25 @@ export default async function OrderConfirmationPage({
 
   const shippingAddress = order.shipping_address as Address;
 
+  const paymentNote =
+    order.payment_method === 'gcash_manual'
+      ? order.payment_status === 'paid'
+        ? 'GCash payment confirmed. We are getting your order ready.'
+        : 'We are checking your GCash reference against the payment. Keep this order number on hand.'
+      : 'Cash on delivery - have exact change ready when it lands.';
+
   return (
     <div className="mx-auto max-w-xl px-6 py-16 md:px-10">
-      <p className="font-mono text-xs uppercase tracking-widest text-hazard">Order placed</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-hazard">Order details</p>
       <h1 className="mt-2 font-display text-3xl tracking-tightest">
-        Thanks — {order.order_number}
+        Locked in - {order.order_number}
       </h1>
-      <p className="mt-4 text-sm text-concrete">
-        We will reach out to arrange payment and confirm shipping. Keep your order
-        number for reference.
-      </p>
+      <p className="mt-4 text-sm text-concrete">{paymentNote}</p>
+      {order.payment_method === 'gcash_manual' && order.payment_reference && (
+        <p className="mt-1 font-mono text-xs text-concrete">
+          Reference: <span className="text-bone">{order.payment_reference}</span>
+        </p>
+      )}
 
       <div className="mt-8 border-t border-concrete/20 pt-6">
         <p className="font-mono text-xs uppercase tracking-widest text-concrete">Shipping to</p>

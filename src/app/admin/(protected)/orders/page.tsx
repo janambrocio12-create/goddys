@@ -116,7 +116,7 @@ export default async function OrdersListPage({
                           {customer.full_name ?? customer.email ?? 'Customer'}
                         </Link>
                       ) : (
-                        <span className="text-concrete">—</span>
+                        <span className="text-concrete">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-concrete">

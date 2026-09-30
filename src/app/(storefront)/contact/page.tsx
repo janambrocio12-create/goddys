@@ -5,7 +5,7 @@ export default function ContactPage() {
       <h1 className="mt-2 font-display text-3xl tracking-tightest md:text-4xl">Get in touch</h1>
 
       <p className="mt-6 text-sm text-concrete">
-        Questions about an order, sizing, or a wholesale inquiry — reach out
+        Questions about an order, sizing, or a wholesale inquiry - hit us up
         and we will get back to you.
       </p>
 
@@ -19,7 +19,7 @@ export default function ContactPage() {
       </div>
 
       <p className="mt-6 font-mono text-[10px] uppercase tracking-wide text-concrete">
-        Placeholder contact details — swap in your real ones before launch.
+        Placeholder contact details - swap in your real ones before launch.
       </p>
     </div>
   );

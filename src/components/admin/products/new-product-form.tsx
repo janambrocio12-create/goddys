@@ -62,7 +62,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>Slug (optional — derived from name if left blank)</span>
+          <span className={labelClass}>Slug (optional - derived from name if left blank)</span>
           <input name="slug" className={inputClass} placeholder="goddys-oversized-tee" />
         </label>
 
@@ -128,7 +128,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
         </div>
 
         <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>Hero image URL (optional — can add more after saving)</span>
+          <span className={labelClass}>Hero image URL (optional - can add more after saving)</span>
           <input name="image_url" className={inputClass} placeholder="https://..." />
         </label>
       </fieldset>

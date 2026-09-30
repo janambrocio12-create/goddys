@@ -251,7 +251,7 @@ export function VariantManager({
     <div>
       {variants.length === 0 ? (
         <p className="border border-dashed border-concrete/40 p-6 text-center text-sm text-concrete">
-          No size/color variants yet — add one below.
+          No size/color variants yet - add one below.
         </p>
       ) : (
         <table className="w-full text-left text-sm">

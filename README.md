@@ -209,7 +209,8 @@ toggle.
 - **`/products/[slug]`** — size/color picker, quantity, "Add to cart".
   Only combinations that exist as a `product_variants` row are
   selectable, and quantity is capped at that variant's live
-  `stock_quantity`.
+  `stock_quantity`. The main photo opens a full-screen zoom on click
+  (arrow keys or the on-screen arrows cycle the gallery, Escape closes it).
 - **Cart (`/cart`)** — client-only, kept in `localStorage` via
   `src/lib/cart/cart-context.tsx`. This is convenience state, not a
   security boundary: the cart can say whatever it wants about price or
@@ -219,9 +220,15 @@ toggle.
   (`orders.customer_id = auth.uid()` is what RLS checks), so an
   unauthenticated visitor is redirected to log in first and sent back to
   `/checkout` afterward.
-- **Checkout (`/checkout`)** — collects a shipping address and an
-  optional discount code, then calls the `create_order()` Postgres
-  function (added in `0005_checkout.sql`) via `supabase.rpc(...)`.
+- **Checkout (`/checkout`)** — collects a shipping address, a payment
+  method (Cash on Delivery or GCash manual reference), and an optional
+  discount code, then calls the `create_order()` Postgres function
+  (added in `0005_checkout.sql`, extended in `0010_payment_method.sql`)
+  via `supabase.rpc(...)`.
+- **`/account/orders`** — a signed-in customer's order history, reusing
+  the order-confirmation page for the detail view of each order (RLS
+  already scopes both to that customer, so this needed no new access
+  rule).
 
 ### Why checkout is one database function instead of an app-level action
 
@@ -253,15 +260,23 @@ sketched under "Never exposing the service-role key" above — an RPC
 transaction beats several sequential JS inserts for something that has
 to be all-or-nothing.
 
-### Payment isn't wired up yet
+### Payment: manual for now (no gateway account yet)
 
-There's no payment gateway integration. Every order is created with
-`payment_status = 'unpaid'`; the confirmation page tells the customer
-you'll follow up. Once you've collected payment (GCash, bank transfer,
-COD, or whatever you land on), open the order in `/admin/orders/[id]`
-and update its payment status there — the column is already there
-(`unpaid`, `paid`, `failed`, `refunded`, `partially_refunded`), it just
-isn't driven by a real gateway yet.
+There's no payment gateway integration - the client has no PayMongo (or
+similar) account yet. `0010_payment_method.sql` adds an interim
+`payment_method` column (`cod` | `gcash_manual`) instead. At checkout the
+customer picks Cash on Delivery or GCash; for GCash they see a GCash
+number/account name (placeholders in `checkout-form.tsx` - swap in the
+real ones) and type in the reference number from their GCash app, which
+is stored on the order as `payment_reference`. Every order is still
+created with `payment_status = 'unpaid'`. An admin opens the order in
+`/admin/orders/[id]`, checks the GCash app against the reference shown
+there, and flips payment status to `paid` by hand - the column is already
+there (`unpaid`, `paid`, `failed`, `refunded`, `partially_refunded`).
+
+Swapping in a real gateway later is additive: add a new `payment_method`
+value and a webhook that calls the same payment-status update path -
+none of the above needs to change.
 
 ### Cancelling an order restores stock
 
@@ -280,12 +295,9 @@ assume for you.
 Per the brief, this is the foundation, not the finished product:
 
 - No admin screen for Discounts yet (Products, Orders, and Customers are
-  done; the Discounts sidebar link is a placeholder for where it'll
-  live) — manage discount codes via the Supabase Table Editor for now.
-- No payment gateway integration — see "Payment isn't wired up yet" above.
-- No order history page for customers (`/account/orders`) — they can
-  still reach an individual order's confirmation page directly by its
-  order number.
+  done; the Discounts sidebar link is a placeholder for where it will
+  live) - manage discount codes via the Supabase Table Editor for now.
+- No real payment gateway - see "Payment: manual for now" above.
 
 The schema, RLS, and auth split above are built so that adding all of
 this is additive — new tables, policies, and routes — rather than a

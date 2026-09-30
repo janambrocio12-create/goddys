@@ -38,7 +38,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         <div className="border border-concrete/20 bg-panel p-4">
           <p className="font-mono text-[10px] uppercase tracking-widest text-concrete">Phone</p>
-          <p className="mt-1 text-sm">{customer.phone ?? '—'}</p>
+          <p className="mt-1 text-sm">{customer.phone ?? '-'}</p>
         </div>
         <div className="border border-concrete/20 bg-panel p-4">
           <p className="font-mono text-[10px] uppercase tracking-widest text-concrete">

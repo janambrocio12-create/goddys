@@ -1,7 +1,7 @@
 export const metadata = {
   title: {
     default: 'Admin',
-    template: '%s — GODDYS Admin',
+    template: '%s - GODDYS Admin',
   },
 };
 

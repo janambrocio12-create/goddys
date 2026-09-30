@@ -45,11 +45,11 @@ export default async function CustomersListPage() {
             <tbody>
               {customers!.map((customer) => (
                 <tr key={customer.id} className="border-b border-concrete/10 last:border-0">
-                  <td className="px-4 py-3">{customer.full_name ?? '—'}</td>
+                  <td className="px-4 py-3">{customer.full_name ?? '-'}</td>
                   <td className="px-4 py-3 font-mono text-xs text-concrete">
-                    {customer.email ?? '—'}
+                    {customer.email ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-concrete">{customer.phone ?? '—'}</td>
+                  <td className="px-4 py-3 text-concrete">{customer.phone ?? '-'}</td>
                   <td className="px-4 py-3 text-concrete">
                     {new Date(customer.created_at).toLocaleDateString('en-PH', {
                       year: 'numeric',
