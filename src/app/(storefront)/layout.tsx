@@ -4,6 +4,8 @@ import { CartProvider } from '@/lib/cart/cart-context';
 import { CartBadge } from '@/components/storefront/cart-badge';
 import { LogoutButton } from '@/components/storefront/logout-button';
 import { TransitionProvider } from '@/components/storefront/transition-provider';
+import { ThemeProvider } from '@/components/storefront/theme-provider';
+import { ThemeToggle } from '@/components/storefront/theme-toggle';
 
 export default async function StorefrontLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -14,8 +16,8 @@ export default async function StorefrontLayout({ children }: { children: React.R
   return (
     <TransitionProvider>
       <CartProvider userId={user?.id ?? null}>
-        <div className="flex min-h-screen flex-col">
-        <header className="flex items-center justify-between border-b border-concrete/20 px-6 py-5 md:px-10">
+        <ThemeProvider>
+          <header className="flex items-center justify-between border-b border-concrete/20 px-6 py-5 md:px-10">
           <Link href="/" className="font-display text-xl tracking-tightest">
             GODDYS
           </Link>
@@ -38,6 +40,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
                 Account
               </Link>
             )}
+            <ThemeToggle />
           </nav>
         </header>
 
@@ -105,7 +108,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
             © {new Date().getFullYear()} GODDYS. All rights reserved.
           </p>
         </footer>
-        </div>
+        </ThemeProvider>
       </CartProvider>
     </TransitionProvider>
   );

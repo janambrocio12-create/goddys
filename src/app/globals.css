@@ -3,6 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  /* Dark palette (the brand default) - lives on :root so it's what the
+     whole app gets with zero setup, admin panel included. Values are
+     space-separated R G B channels (no rgb()/commas) so Tailwind's
+     rgb(var(--x) / <alpha-value>) opacity modifiers work. */
+  :root,
+  [data-theme='dark'] {
+    --color-ink: 11 11 12;
+    --color-bone: 237 234 227;
+    --color-concrete: 138 138 133;
+    --color-panel: 20 20 21;
+    --color-hazard: 242 199 68;
+    --color-danger: 193 70 47;
+  }
+
+  /* Light mode - storefront only. The theme toggle sets data-theme="light"
+     on a wrapper inside the (storefront) layout; the admin panel never
+     sets this attribute, so it's unreachable there and always stays dark.
+     This is deliberately "swap ink and bone" rather than a new palette:
+     every existing bg-ink/text-bone (or bg-bone/text-ink) pairing in the
+     app was already built for contrast, so flipping both tokens together
+     keeps that contrast correct everywhere without touching component
+     markup. Hazard/danger are deepened slightly so they stay readable as
+     text on a light background instead of a dark one. */
+  [data-theme='light'] {
+    --color-ink: 237 234 227;
+    --color-bone: 15 15 16;
+    --color-concrete: 94 94 90;
+    --color-panel: 224 220 210;
+    --color-hazard: 150 110 20;
+    --color-danger: 158 54 35;
+  }
+
   * {
     @apply border-concrete/20;
   }

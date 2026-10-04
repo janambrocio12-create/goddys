@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart/cart-context';
 import { formatMoney } from '@/lib/format';
 import { placeOrder, type CheckoutAddressInput } from '@/app/(storefront)/checkout/actions';
-import type { PaymentMethod } from '@/lib/types/database.types';
 
-// No payment gateway account yet, so this is the interim setup: cash on
-// delivery, or a manual e-wallet transfer (GCash or PayMaya) the client
-// verifies by eye. Both wallets land in the same account, just different
-// apps - so same number and name, different QR per app.
+// No payment gateway account yet, so this is the interim setup: a manual
+// e-wallet transfer (GCash or PayMaya) the client verifies by eye. Both
+// wallets land in the same account, just different apps - so same number
+// and name, different QR per app. Cash on delivery used to be a third
+// option here but the client dropped it - orders placed with it before
+// still display fine (see order-confirmation and admin), it's just gone
+// from checkout going forward.
 const WALLET_ACCOUNT_NUMBER = '0995 528 6273';
 const WALLET_ACCOUNT_NAME = 'Miguel Armildez';
 
@@ -29,10 +31,6 @@ const WALLET_CONFIG: Record<WalletMethod, { label: string; qrImage: string; qrAl
     qrAlt: 'GODDYS PayMaya QR code',
   },
 };
-
-function isWalletMethod(method: PaymentMethod): method is WalletMethod {
-  return method === 'gcash_manual' || method === 'paymaya_manual';
-}
 
 const EMPTY_ADDRESS: CheckoutAddressInput = {
   full_name: '',
@@ -60,7 +58,7 @@ export function CheckoutForm({
     phone: initialPhone ?? '',
   });
   const [discountCode, setDiscountCode] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<WalletMethod>('gcash_manual');
   const [paymentReference, setPaymentReference] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -77,7 +75,7 @@ export function CheckoutForm({
     event.preventDefault();
     setError(null);
 
-    if (isWalletMethod(paymentMethod) && paymentReference.trim().length === 0) {
+    if (paymentReference.trim().length === 0) {
       setError(`Enter your ${WALLET_CONFIG[paymentMethod].label} reference number to continue.`);
       return;
     }
@@ -220,18 +218,7 @@ export function CheckoutForm({
         <div className="mt-2 flex flex-col gap-3 border-t border-concrete/20 pt-4">
           <p className="font-mono text-xs uppercase tracking-widest text-concrete">Payment</p>
 
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('cod')}
-              className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
-                paymentMethod === 'cod'
-                  ? 'border-bone bg-bone text-ink'
-                  : 'border-concrete/40 text-bone hover:border-bone'
-              }`}
-            >
-              Cash on delivery
-            </button>
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setPaymentMethod('gcash_manual')}
@@ -256,43 +243,41 @@ export function CheckoutForm({
             </button>
           </div>
 
-          {isWalletMethod(paymentMethod) && (
-            <div className="flex flex-col gap-3 border border-hazard/40 bg-panel p-4">
-              <p className="text-sm text-bone">
-                Scan the QR or send straight to the number below, then drop the reference
-                number here so we can confirm it and get your order moving.
-              </p>
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                <div className="w-32 shrink-0 overflow-hidden border border-concrete/30 bg-bone">
-                  <Image
-                    src={WALLET_CONFIG[paymentMethod].qrImage}
-                    alt={WALLET_CONFIG[paymentMethod].qrAlt}
-                    width={300}
-                    height={333}
-                    className="h-auto w-full"
-                  />
-                </div>
-                <p className="font-mono text-xs text-concrete">
-                  {WALLET_CONFIG[paymentMethod].label} number:{' '}
-                  <span className="text-hazard">{WALLET_ACCOUNT_NUMBER}</span>
-                  <br />
-                  Account name: <span className="text-hazard">{WALLET_ACCOUNT_NAME}</span>
-                </p>
-              </div>
-              <label className="flex flex-col gap-1.5">
-                <span className="font-mono text-xs uppercase tracking-wide text-concrete">
-                  {WALLET_CONFIG[paymentMethod].label} reference number
-                </span>
-                <input
-                  required
-                  value={paymentReference}
-                  onChange={(e) => setPaymentReference(e.target.value)}
-                  placeholder="e.g. 0123456789012"
-                  className="border border-concrete/40 bg-ink px-3 py-2 text-sm text-bone outline-none focus-visible:border-hazard"
+          <div className="flex flex-col gap-3 border border-hazard/40 bg-panel p-4">
+            <p className="text-sm text-bone">
+              Scan the QR or send straight to the number below, then drop the reference
+              number here so we can confirm it and get your order moving.
+            </p>
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <div className="w-32 shrink-0 overflow-hidden border border-concrete/30 bg-bone">
+                <Image
+                  src={WALLET_CONFIG[paymentMethod].qrImage}
+                  alt={WALLET_CONFIG[paymentMethod].qrAlt}
+                  width={300}
+                  height={333}
+                  className="h-auto w-full"
                 />
-              </label>
+              </div>
+              <p className="font-mono text-xs text-concrete">
+                {WALLET_CONFIG[paymentMethod].label} number:{' '}
+                <span className="text-hazard">{WALLET_ACCOUNT_NUMBER}</span>
+                <br />
+                Account name: <span className="text-hazard">{WALLET_ACCOUNT_NAME}</span>
+              </p>
             </div>
-          )}
+            <label className="flex flex-col gap-1.5">
+              <span className="font-mono text-xs uppercase tracking-wide text-concrete">
+                {WALLET_CONFIG[paymentMethod].label} reference number
+              </span>
+              <input
+                required
+                value={paymentReference}
+                onChange={(e) => setPaymentReference(e.target.value)}
+                placeholder="e.g. 0123456789012"
+                className="border border-concrete/40 bg-ink px-3 py-2 text-sm text-bone outline-none focus-visible:border-hazard"
+              />
+            </label>
+          </div>
         </div>
 
         {error && (
@@ -310,9 +295,8 @@ export function CheckoutForm({
         </button>
 
         <p className="font-mono text-[10px] uppercase tracking-wide text-concrete">
-          {isWalletMethod(paymentMethod)
-            ? `We will check your ${WALLET_CONFIG[paymentMethod].label} reference and confirm before your order ships.`
-            : 'Cash on delivery - have exact change ready when it lands.'}
+          We will check your {WALLET_CONFIG[paymentMethod].label} reference and confirm before
+          your order ships.
         </p>
       </form>
 

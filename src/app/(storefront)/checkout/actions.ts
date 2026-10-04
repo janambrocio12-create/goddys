@@ -41,16 +41,18 @@ export async function placeOrder(
     return { success: false, error: 'Your cart is empty.' };
   }
 
-  const isWalletMethod = paymentMethod === 'gcash_manual' || paymentMethod === 'paymaya_manual';
+  // Cash on delivery is no longer offered at checkout - client's call. The
+  // form itself never sends 'cod' anymore, but this catches a direct call
+  // (API abuse, a stale client, etc) instead of trusting the input.
+  if (paymentMethod === 'cod') {
+    return { success: false, error: 'Cash on delivery is not available - choose GCash or PayMaya.' };
+  }
 
-  if (isWalletMethod && paymentReference.trim().length === 0) {
+  if (paymentReference.trim().length === 0) {
     return { success: false, error: 'Enter your reference number to continue.' };
   }
 
-  // Only carry the reference through for GCash/PayMaya - otherwise leftover
-  // text from switching payment methods in the form could get saved on a
-  // COD order and confuse whoever reviews it in the admin panel.
-  const effectiveReference = isWalletMethod ? paymentReference.trim() : null;
+  const effectiveReference = paymentReference.trim();
 
   const { data, error } = await supabase.rpc('create_order', {
     p_shipping_address: shippingAddress,

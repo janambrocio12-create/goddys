@@ -3,7 +3,10 @@ import { ShopNowButton } from '@/components/storefront/shop-now-button';
 
 export default function HomePage() {
   return (
-    <section className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 md:px-10">
+    <section
+      data-theme="dark"
+      className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 md:px-10"
+    >
       <Image
         src="/images/hero-bg.jpg"
         alt=""

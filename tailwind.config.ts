@@ -4,17 +4,25 @@ import type { Config } from 'tailwindcss';
 // Palette: near-black ground, bone foreground, a single hazard-yellow
 // accent used sparingly (stamps, tags, status) — kept away from the
 // generic "near-black + acid-green/vermilion" pairing.
+//
+// Colors are driven by CSS variables (see globals.css) rather than fixed
+// hex so the storefront can offer a light mode: the admin panel never
+// sets a `data-theme` attribute, so it always resolves the dark values -
+// these tokens aren't "a color", they're "a role" (background, raised
+// surface, accent) that light mode remaps. The rgb()/<alpha-value>
+// pattern is required for Tailwind's opacity modifiers (bg-ink/70, etc)
+// to keep working against a CSS variable.
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        ink: '#0B0B0C',        // primary background
-        bone: '#EDEAE3',       // primary foreground / paper
-        concrete: '#8A8A85',   // muted text, dividers
-        panel: '#141415',      // raised surfaces in dark UI (admin)
-        hazard: '#F2C744',     // single accent: tags, stamps, alerts
-        danger: '#C1462F',     // errors only — not a decorative color
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',        // primary background
+        bone: 'rgb(var(--color-bone) / <alpha-value>)',       // primary foreground / paper
+        concrete: 'rgb(var(--color-concrete) / <alpha-value>)', // muted text, dividers
+        panel: 'rgb(var(--color-panel) / <alpha-value>)',      // raised surfaces
+        hazard: 'rgb(var(--color-hazard) / <alpha-value>)',    // single accent: tags, stamps, alerts
+        danger: 'rgb(var(--color-danger) / <alpha-value>)',    // errors only — not a decorative color
       },
       fontFamily: {
         display: ['var(--font-display)', 'Arial Black', 'sans-serif'],

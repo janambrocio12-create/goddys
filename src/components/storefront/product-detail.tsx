@@ -137,7 +137,10 @@ export function ProductDetail({
                 alt={activeImage.alt_text ?? product.name}
                 className="h-full w-full object-cover"
               />
-              <span className="absolute bottom-3 right-3 bg-ink/70 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-bone">
+              <span
+                data-theme="dark"
+                className="absolute bottom-3 right-3 bg-ink/70 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-bone"
+              >
                 Zoom
               </span>
             </button>
@@ -266,6 +269,7 @@ export function ProductDetail({
 
       {isZoomOpen && activeImage && (
         <div
+          data-theme="dark"
           className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4"
           onClick={() => setIsZoomOpen(false)}
         >

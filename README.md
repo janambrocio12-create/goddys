@@ -221,14 +221,26 @@ toggle.
   unauthenticated visitor is redirected to log in first and sent back to
   `/checkout` afterward.
 - **Checkout (`/checkout`)** — collects a shipping address, a payment
-  method (Cash on Delivery or GCash manual reference), and an optional
-  discount code, then calls the `create_order()` Postgres function
-  (added in `0005_checkout.sql`, extended in `0010_payment_method.sql`)
-  via `supabase.rpc(...)`.
+  method (GCash or PayMaya, each with a manual reference number), and an
+  optional discount code, then calls the `create_order()` Postgres
+  function (added in `0005_checkout.sql`, extended in
+  `0010_payment_method.sql`, `0011`/`0012`) via `supabase.rpc(...)`.
 - **`/account/orders`** — a signed-in customer's order history, reusing
   the order-confirmation page for the detail view of each order (RLS
   already scopes both to that customer, so this needed no new access
   rule).
+- **Dark / light mode (storefront only)** — a toggle in the storefront
+  header (`theme-toggle.tsx`) flips a `data-theme` attribute on a wrapper
+  rendered by `theme-provider.tsx`, remembered in `localStorage`. Every
+  brand color (`ink`, `bone`, `concrete`, `panel`, `hazard`, `danger`) is
+  a CSS variable (`globals.css`) that `tailwind.config.ts` reads through
+  `rgb(var(--color-x) / <alpha-value>)`, so no component file needed to
+  change - light mode is really "swap ink and bone," which keeps every
+  existing contrast pairing correct automatically. A few spots that sit
+  on top of a photo (the home hero, the product-image zoom) are pinned
+  to `data-theme="dark"` on purpose so they don't wash out in light mode.
+  The admin panel never renders the toggle or sets `data-theme`, so it's
+  always on the dark palette - same look as before.
 
 ### Why checkout is one database function instead of an app-level action
 
@@ -264,15 +276,20 @@ to be all-or-nothing.
 
 There's no payment gateway integration - the client has no PayMongo (or
 similar) account yet. `0010_payment_method.sql` adds an interim
-`payment_method` column (`cod` | `gcash_manual`) instead. At checkout the
-customer picks Cash on Delivery or GCash; for GCash they see a GCash
-number/account name (placeholders in `checkout-form.tsx` - swap in the
-real ones) and type in the reference number from their GCash app, which
-is stored on the order as `payment_reference`. Every order is still
-created with `payment_status = 'unpaid'`. An admin opens the order in
-`/admin/orders/[id]`, checks the GCash app against the reference shown
-there, and flips payment status to `paid` by hand - the column is already
-there (`unpaid`, `paid`, `failed`, `refunded`, `partially_refunded`).
+`payment_method` column, extended by `0011_add_paymaya_payment_method.sql`
+to its current values: `cod` | `gcash_manual` | `paymaya_manual`. At
+checkout the customer picks GCash or PayMaya (Cash on Delivery was
+dropped at the client's request - `cod` stays in the enum only so
+historical orders placed with it still display correctly, checkout no
+longer offers it and the server action rejects it defensively). For
+either wallet they see its QR code and the account number/name
+(`checkout-form.tsx`), and type in the reference number from their GCash
+or PayMaya app, which is stored on the order as `payment_reference`.
+Every order is still created with `payment_status = 'unpaid'`. An admin
+opens the order in `/admin/orders/[id]`, checks the matching app against
+the reference shown there, and flips payment status to `paid` by hand -
+the column is already there (`unpaid`, `paid`, `failed`, `refunded`,
+`partially_refunded`).
 
 Swapping in a real gateway later is additive: add a new `payment_method`
 value and a webhook that calls the same payment-status update path -
