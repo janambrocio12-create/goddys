@@ -5,8 +5,9 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Runs on every request. Two jobs:
  *  1. Refresh the Supabase auth cookie so server components always see a
  *     current session (standard @supabase/ssr pattern).
- *  2. Gate everything under /admin (except /admin/login) behind an
- *     active admin_profiles row — a signed-in *customer* is not enough.
+ *  2. Gate everything under /admin (except the public auth pages below)
+ *     behind an active admin_profiles row — a signed-in *customer* is
+ *     not enough.
  *
  * This is the outer perimeter, not the only check: pages under
  * (admin)/ also call requireAdmin() (see src/lib/auth/get-admin.ts) so
@@ -39,10 +40,18 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const isLoginRoute = request.nextUrl.pathname === '/admin/login';
+  // Reset/forgot-password pages must stay reachable with no admin
+  // session yet (that's the whole point of them) — a recovery link's
+  // token lives in the URL hash, which this server-side check never
+  // sees, so gating these the same as the rest of /admin would bounce
+  // a legitimate reset straight back to /admin/login before the page's
+  // client JS even runs.
+  const PUBLIC_ADMIN_ROUTES = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
 
-  if (isAdminRoute && !isLoginRoute) {
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const isPublicAdminRoute = PUBLIC_ADMIN_ROUTES.includes(request.nextUrl.pathname);
+
+  if (isAdminRoute && !isPublicAdminRoute) {
     if (!user) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
