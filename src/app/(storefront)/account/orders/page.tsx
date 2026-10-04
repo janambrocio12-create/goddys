@@ -65,7 +65,11 @@ export default async function CustomerOrdersPage() {
                     day: 'numeric',
                   })}
                   {' · '}
-                  {order.payment_method === 'gcash_manual' ? 'GCash' : 'Cash on delivery'}
+                  {order.payment_method === 'gcash_manual'
+                    ? 'GCash'
+                    : order.payment_method === 'paymaya_manual'
+                      ? 'PayMaya'
+                      : 'Cash on delivery'}
                   {' · '}
                   {order.payment_status.replace('_', ' ')}
                 </p>

@@ -41,14 +41,16 @@ export async function placeOrder(
     return { success: false, error: 'Your cart is empty.' };
   }
 
-  if (paymentMethod === 'gcash_manual' && paymentReference.trim().length === 0) {
-    return { success: false, error: 'Enter your GCash reference number to continue.' };
+  const isWalletMethod = paymentMethod === 'gcash_manual' || paymentMethod === 'paymaya_manual';
+
+  if (isWalletMethod && paymentReference.trim().length === 0) {
+    return { success: false, error: 'Enter your reference number to continue.' };
   }
 
-  // Only carry the reference through for GCash - otherwise leftover text
-  // from switching payment methods in the form could get saved on a COD
-  // order and confuse whoever reviews it in the admin panel.
-  const effectiveReference = paymentMethod === 'gcash_manual' ? paymentReference.trim() : null;
+  // Only carry the reference through for GCash/PayMaya - otherwise leftover
+  // text from switching payment methods in the form could get saved on a
+  // COD order and confuse whoever reviews it in the admin panel.
+  const effectiveReference = isWalletMethod ? paymentReference.trim() : null;
 
   const { data, error } = await supabase.rpc('create_order', {
     p_shipping_address: shippingAddress,

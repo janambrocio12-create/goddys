@@ -96,12 +96,17 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               Payment method
             </p>
             <p className="mt-2 text-sm">
-              {order.payment_method === 'gcash_manual' ? 'GCash (manual)' : 'Cash on delivery'}
+              {order.payment_method === 'gcash_manual'
+                ? 'GCash (manual)'
+                : order.payment_method === 'paymaya_manual'
+                  ? 'PayMaya (manual)'
+                  : 'Cash on delivery'}
             </p>
-            {order.payment_method === 'gcash_manual' && (
+            {(order.payment_method === 'gcash_manual' || order.payment_method === 'paymaya_manual') && (
               <p className="mt-1 font-mono text-xs text-hazard">
-                Reference: {order.payment_reference ?? '-'} - check the GCash app before
-                marking this paid.
+                Reference: {order.payment_reference ?? '-'} - check the{' '}
+                {order.payment_method === 'gcash_manual' ? 'GCash' : 'PayMaya'} app before marking
+                this paid.
               </p>
             )}
           </div>

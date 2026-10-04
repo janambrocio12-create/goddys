@@ -27,12 +27,18 @@ export default async function OrderConfirmationPage({
 
   const shippingAddress = order.shipping_address as Address;
 
-  const paymentNote =
+  const walletLabel =
     order.payment_method === 'gcash_manual'
-      ? order.payment_status === 'paid'
-        ? 'GCash payment confirmed. We are getting your order ready.'
-        : 'We are checking your GCash reference against the payment. Keep this order number on hand.'
-      : 'Cash on delivery - have exact change ready when it lands.';
+      ? 'GCash'
+      : order.payment_method === 'paymaya_manual'
+        ? 'PayMaya'
+        : null;
+
+  const paymentNote = walletLabel
+    ? order.payment_status === 'paid'
+      ? `${walletLabel} payment confirmed. We are getting your order ready.`
+      : `We are checking your ${walletLabel} reference against the payment. Keep this order number on hand.`
+    : 'Cash on delivery - have exact change ready when it lands.';
 
   return (
     <div className="mx-auto max-w-xl px-6 py-16 md:px-10">
@@ -41,7 +47,7 @@ export default async function OrderConfirmationPage({
         Locked in - {order.order_number}
       </h1>
       <p className="mt-4 text-sm text-concrete">{paymentNote}</p>
-      {order.payment_method === 'gcash_manual' && order.payment_reference && (
+      {walletLabel && order.payment_reference && (
         <p className="mt-1 font-mono text-xs text-concrete">
           Reference: <span className="text-bone">{order.payment_reference}</span>
         </p>
