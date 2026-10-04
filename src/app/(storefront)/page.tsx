@@ -1,21 +1,10 @@
-import Image from 'next/image';
 import { ShopNowButton } from '@/components/storefront/shop-now-button';
+import { HeroBackground } from '@/components/storefront/hero-background';
 
 export default function HomePage() {
   return (
-    <section
-      data-theme="dark"
-      className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 md:px-10"
-    >
-      <Image
-        src="/images/hero-bg.jpg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-ink/30" />
+    <section className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 md:px-10">
+      <HeroBackground />
 
       <div className="relative mx-auto w-full max-w-7xl">
         <p className="font-mono text-xs uppercase tracking-widest text-hazard">
