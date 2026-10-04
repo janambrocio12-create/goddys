@@ -45,13 +45,18 @@ export async function placeOrder(
     return { success: false, error: 'Enter your GCash reference number to continue.' };
   }
 
+  // Only carry the reference through for GCash - otherwise leftover text
+  // from switching payment methods in the form could get saved on a COD
+  // order and confuse whoever reviews it in the admin panel.
+  const effectiveReference = paymentMethod === 'gcash_manual' ? paymentReference.trim() : null;
+
   const { data, error } = await supabase.rpc('create_order', {
     p_shipping_address: shippingAddress,
     p_billing_address: null,
     p_discount_code: discountCode.trim() || null,
     p_items: items.map((i) => ({ variant_id: i.variantId, quantity: i.quantity })),
     p_payment_method: paymentMethod,
-    p_payment_reference: paymentReference.trim() || null,
+    p_payment_reference: effectiveReference,
   });
 
   if (error) {
