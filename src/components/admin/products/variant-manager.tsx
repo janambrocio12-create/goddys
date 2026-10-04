@@ -156,27 +156,24 @@ function VariantRow({ productId, variant }: { productId: string; variant: Varian
   if (isEditing) {
     return (
       <tr className="border-b border-concrete/10">
-        <td className="px-3 py-2" colSpan={5}>
+        <td className="px-3 py-2" colSpan={4}>
           <div className="flex flex-wrap items-center gap-2">
             <input
               value={draft.size}
               onChange={(e) => setDraft((d) => ({ ...d, size: e.target.value }))}
+              placeholder="Size"
               className={`${inputClass} w-20`}
             />
             <input
               value={draft.color}
               onChange={(e) => setDraft((d) => ({ ...d, color: e.target.value }))}
+              placeholder="Color"
               className={`${inputClass} w-28`}
-            />
-            <input
-              value={draft.sku}
-              onChange={(e) => setDraft((d) => ({ ...d, sku: e.target.value }))}
-              className={`${inputClass} w-40`}
             />
             <input
               type="number"
               step="0.01"
-              placeholder="Price override"
+              placeholder="Different price (optional)"
               value={draft.price_override ?? ''}
               onChange={(e) =>
                 setDraft((d) => ({
@@ -208,7 +205,6 @@ function VariantRow({ productId, variant }: { productId: string; variant: Varian
     <tr className="border-b border-concrete/10 align-top">
       <td className="px-3 py-2">{variant.size}</td>
       <td className="px-3 py-2">{variant.color}</td>
-      <td className="px-3 py-2 font-mono text-xs">{variant.sku}</td>
       <td className="px-3 py-2 font-mono">{variant.stock_quantity}</td>
       <td className="px-3 py-2">
         <div className="flex flex-col items-start gap-2">
@@ -265,7 +261,6 @@ export function VariantManager({
             <tr className="border-b border-concrete/20 font-mono text-[10px] uppercase tracking-widest text-concrete">
               <th className="px-3 py-2">Size</th>
               <th className="px-3 py-2">Color</th>
-              <th className="px-3 py-2">SKU</th>
               <th className="px-3 py-2">Stock</th>
               <th className="px-3 py-2">Actions</th>
             </tr>
@@ -278,7 +273,7 @@ export function VariantManager({
         </table>
       )}
 
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] border border-concrete/20 bg-panel p-3">
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_1fr_1fr_auto] border border-concrete/20 bg-panel p-3">
         <input
           placeholder="Size"
           value={newVariant.size}
@@ -292,13 +287,17 @@ export function VariantManager({
           className={inputClass}
         />
         <input
-          placeholder="Variant SKU"
-          value={newVariant.sku}
-          onChange={(e) => setNewVariant((v) => ({ ...v, sku: e.target.value }))}
+          placeholder="Stock"
+          type="number"
+          min="0"
+          value={newVariant.initial_stock}
+          onChange={(e) =>
+            setNewVariant((v) => ({ ...v, initial_stock: Number(e.target.value) || 0 }))
+          }
           className={inputClass}
         />
         <input
-          placeholder="Price override"
+          placeholder="Different price (optional)"
           type="number"
           step="0.01"
           value={newVariant.price_override ?? ''}
@@ -307,16 +306,6 @@ export function VariantManager({
               ...v,
               price_override: e.target.value ? Number(e.target.value) : null,
             }))
-          }
-          className={inputClass}
-        />
-        <input
-          placeholder="Initial stock"
-          type="number"
-          min="0"
-          value={newVariant.initial_stock}
-          onChange={(e) =>
-            setNewVariant((v) => ({ ...v, initial_stock: Number(e.target.value) || 0 }))
           }
           className={inputClass}
         />

@@ -17,10 +17,6 @@ export default function ContactPage() {
           Instagram: <span className="text-bone">@goddys.ph</span>
         </p>
       </div>
-
-      <p className="mt-6 font-mono text-[10px] uppercase tracking-wide text-concrete">
-        Placeholder contact details - swap in your real ones before launch.
-      </p>
     </div>
   );
 }

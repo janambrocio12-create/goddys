@@ -45,10 +45,12 @@ export function EditProductForm({
         <input name="name" required defaultValue={product.name} className={inputClass} />
       </label>
 
-      <label className="flex flex-col gap-1.5">
-        <span className={labelClass}>Slug</span>
-        <input name="slug" defaultValue={product.slug} className={inputClass} />
-      </label>
+      {/* Slug and SKU are internal reference codes with no business
+          meaning to a shop admin - keep them exactly as they are instead
+          of exposing a field that would just confuse, or let a save
+          silently change a product's URL/code. */}
+      <input type="hidden" name="slug" value={product.slug} />
+      <input type="hidden" name="sku" value={product.sku} />
 
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>Description</span>
@@ -86,34 +88,28 @@ export function EditProductForm({
         </label>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>SKU</span>
-          <input name="sku" required defaultValue={product.sku} className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>Category</span>
-          <select
-            name="category_id"
-            defaultValue={product.category_id ?? ''}
-            className={inputClass}
-          >
-            <option value="">No category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <label className="flex flex-col gap-1.5">
+        <span className={labelClass}>Category</span>
+        <select
+          name="category_id"
+          defaultValue={product.category_id ?? ''}
+          className={inputClass}
+        >
+          <option value="">No category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="flex flex-col gap-1.5">
         <span className={labelClass}>Status</span>
         <select name="status" defaultValue={product.status} className={inputClass}>
-          <option value="draft">Draft</option>
-          <option value="active">Active</option>
-          <option value="archived">Archived</option>
+          <option value="draft">Draft - hidden, not for sale yet</option>
+          <option value="active">Active - visible and for sale in the shop</option>
+          <option value="archived">Archived - taken down, kept on record</option>
         </select>
       </label>
 

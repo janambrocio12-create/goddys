@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Stops the "X-Powered-By: Next.js" response header, so the
+  // framework isn't fingerprinted by anyone checking network requests.
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {

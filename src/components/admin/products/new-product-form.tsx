@@ -62,11 +62,6 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>Slug (optional - derived from name if left blank)</span>
-          <input name="slug" className={inputClass} placeholder="goddys-oversized-tee" />
-        </label>
-
-        <label className="flex flex-col gap-1.5">
           <span className={labelClass}>Description</span>
           <textarea name="description" rows={4} className={inputClass} />
         </label>
@@ -89,30 +84,24 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           </label>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClass}>SKU</span>
-            <input name="sku" required className={inputClass} placeholder="GDY-TEE-001" />
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClass}>Category</span>
-            <select name="category_id" className={inputClass} defaultValue="">
-              <option value="">No category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>Category</span>
+          <select name="category_id" className={inputClass} defaultValue="">
+            <option value="">No category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <label className="flex flex-col gap-1.5">
           <span className={labelClass}>Status</span>
           <select name="status" className={inputClass} defaultValue="draft">
-            <option value="draft">Draft</option>
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
+            <option value="draft">Draft - hidden, not for sale yet</option>
+            <option value="active">Active - visible and for sale in the shop</option>
+            <option value="archived">Archived - taken down, kept on record</option>
           </select>
         </label>
 
@@ -127,10 +116,9 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           </label>
         </div>
 
-        <label className="flex flex-col gap-1.5">
-          <span className={labelClass}>Hero image URL (optional - can add more after saving)</span>
-          <input name="image_url" className={inputClass} placeholder="https://..." />
-        </label>
+        <p className="text-sm text-concrete">
+          You can upload photos once the product is created - no need to add one now.
+        </p>
       </fieldset>
 
       <fieldset className="flex flex-col gap-4">
@@ -138,59 +126,74 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           Sizes &amp; colors
         </legend>
         <p className="-mt-2 text-sm text-concrete">
-          Each row becomes one purchasable size/color combination with its own stock.
+          Add one row per size/color you&apos;re selling - e.g. a shirt in M and L, each in Black
+          and White, is 4 rows.
         </p>
 
         <div className="flex flex-col gap-3">
           {variants.map((variant, index) => (
             <div
               key={index}
-              className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] border border-concrete/20 bg-panel p-3"
+              className="flex flex-col gap-3 border border-concrete/20 bg-panel p-3 sm:grid sm:grid-cols-[1fr_1fr_1fr_1fr_auto] sm:items-end sm:gap-2"
             >
-              <input
-                placeholder="Size (e.g. M)"
-                value={variant.size}
-                onChange={(e) => updateVariant(index, { size: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                placeholder="Color"
-                value={variant.color}
-                onChange={(e) => updateVariant(index, { color: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                placeholder="Variant SKU"
-                value={variant.sku}
-                onChange={(e) => updateVariant(index, { sku: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                placeholder="Price override"
-                type="number"
-                step="0.01"
-                value={variant.price_override ?? ''}
-                onChange={(e) =>
-                  updateVariant(index, {
-                    price_override: e.target.value ? Number(e.target.value) : null,
-                  })
-                }
-                className={inputClass}
-              />
-              <input
-                placeholder="Initial stock"
-                type="number"
-                min="0"
-                value={variant.initial_stock}
-                onChange={(e) =>
-                  updateVariant(index, { initial_stock: Number(e.target.value) || 0 })
-                }
-                className={inputClass}
-              />
+              <label className="flex flex-col gap-1">
+                <span className="font-mono text-[10px] uppercase tracking-wide text-concrete">
+                  Size
+                </span>
+                <input
+                  placeholder="e.g. M"
+                  value={variant.size}
+                  onChange={(e) => updateVariant(index, { size: e.target.value })}
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="font-mono text-[10px] uppercase tracking-wide text-concrete">
+                  Color
+                </span>
+                <input
+                  placeholder="e.g. Black"
+                  value={variant.color}
+                  onChange={(e) => updateVariant(index, { color: e.target.value })}
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="font-mono text-[10px] uppercase tracking-wide text-concrete">
+                  Stock
+                </span>
+                <input
+                  placeholder="0"
+                  type="number"
+                  min="0"
+                  value={variant.initial_stock}
+                  onChange={(e) =>
+                    updateVariant(index, { initial_stock: Number(e.target.value) || 0 })
+                  }
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="font-mono text-[10px] uppercase tracking-wide text-concrete">
+                  Different price?
+                </span>
+                <input
+                  placeholder="Same as above"
+                  type="number"
+                  step="0.01"
+                  value={variant.price_override ?? ''}
+                  onChange={(e) =>
+                    updateVariant(index, {
+                      price_override: e.target.value ? Number(e.target.value) : null,
+                    })
+                  }
+                  className={inputClass}
+                />
+              </label>
               <button
                 type="button"
                 onClick={() => removeVariantRow(index)}
-                className="font-mono text-xs uppercase text-danger hover:underline"
+                className="font-mono text-xs uppercase text-danger hover:underline sm:pb-2.5"
               >
                 Remove
               </button>

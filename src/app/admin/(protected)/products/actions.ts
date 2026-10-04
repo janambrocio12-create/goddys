@@ -18,21 +18,50 @@ export type NewVariantInput = {
 
 type ProductFieldsFromForm = Database['public']['Tables']['products']['Insert'];
 
+/** Turns free text into an uppercase, hyphen-only code safe to use inside
+ * a SKU - e.g. "Forest Green" -> "FOREST-GREEN". */
+function skuSegment(value: string): string {
+  return value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** Builds a readable, collision-safe variant SKU from the product's own
+ * SKU plus its size/color, so an admin never has to invent one. SKU is
+ * globally unique and (product_id, size, color) is unique per product,
+ * so this combination is guaranteed unique too. */
+function buildVariantSku(productSku: string, size: string, color: string): string {
+  return [productSku, skuSegment(size), skuSegment(color)].filter(Boolean).join('-');
+}
+
+/**
+ * The admin-facing forms no longer ask for a slug or SKU - both are
+ * internal reference codes with no business meaning, and they were the
+ * #1 point of confusion for a non-technical admin. The new-product form
+ * sends neither, so both are auto-derived from the name here; the edit
+ * form instead sends the product's existing slug/sku back as hidden
+ * fields so a later save never silently changes them.
+ */
 function readProductFields(formData: FormData): ProductFieldsFromForm {
   const name = String(formData.get('name') ?? '').trim();
   const slugInput = String(formData.get('slug') ?? '').trim();
+  const skuInput = String(formData.get('sku') ?? '').trim();
   const priceRaw = String(formData.get('price') ?? '');
   const salePriceRaw = String(formData.get('sale_price') ?? '').trim();
   const categoryId = String(formData.get('category_id') ?? '').trim();
 
+  const slug = slugify(slugInput || name);
+
   return {
     name,
-    slug: slugify(slugInput || name),
+    slug,
     description: String(formData.get('description') ?? '').trim() || null,
     price: Number(priceRaw),
     sale_price: salePriceRaw ? Number(salePriceRaw) : null,
     category_id: categoryId || null,
-    sku: String(formData.get('sku') ?? '').trim(),
+    sku: skuInput || slug.toUpperCase(),
     status: (String(formData.get('status') ?? 'draft') as ProductStatus),
     is_featured: formData.get('is_featured') === 'on',
     is_new_arrival: formData.get('is_new_arrival') === 'on',
@@ -49,8 +78,8 @@ export async function createProduct(_prevState: ActionResult | null, formData: F
   const supabase = createClient();
   const fields = readProductFields(formData);
 
-  if (!fields.name || !fields.sku || !Number.isFinite(fields.price)) {
-    return { error: 'Name, SKU, and a valid price are required.' };
+  if (!fields.name || !Number.isFinite(fields.price)) {
+    return { error: 'Name and a valid price are required.' };
   }
 
   const { data: product, error: productError } = await supabase
@@ -70,7 +99,7 @@ export async function createProduct(_prevState: ActionResult | null, formData: F
   } catch {
     variants = [];
   }
-  variants = variants.filter((v) => v.size.trim() && v.color.trim() && v.sku.trim());
+  variants = variants.filter((v) => v.size.trim() && v.color.trim());
 
   if (variants.length > 0) {
     const { data: insertedVariants, error: variantError } = await supabase
@@ -80,7 +109,7 @@ export async function createProduct(_prevState: ActionResult | null, formData: F
           product_id: product.id,
           size: v.size.trim(),
           color: v.color.trim(),
-          sku: v.sku.trim(),
+          sku: v.sku.trim() || buildVariantSku(product.sku, v.size, v.color),
           price_override: v.price_override,
         })),
       )
@@ -131,8 +160,8 @@ export async function updateProduct(
   const supabase = createClient();
   const fields = readProductFields(formData);
 
-  if (!fields.name || !fields.sku || !Number.isFinite(fields.price)) {
-    return { error: 'Name, SKU, and a valid price are required.' };
+  if (!fields.name || !Number.isFinite(fields.price)) {
+    return { error: 'Name and a valid price are required.' };
   }
 
   const { error } = await supabase.from('products').update(fields).eq('id', productId);
@@ -166,8 +195,21 @@ export async function addVariant(
 ): Promise<ActionResult> {
   const supabase = createClient();
 
-  if (!input.size.trim() || !input.color.trim() || !input.sku.trim()) {
-    return { error: 'Size, color, and SKU are required for a variant.' };
+  if (!input.size.trim() || !input.color.trim()) {
+    return { error: 'Size and color are required for a variant.' };
+  }
+
+  let sku = input.sku.trim();
+  if (!sku) {
+    const { data: product } = await supabase
+      .from('products')
+      .select('sku')
+      .eq('id', productId)
+      .maybeSingle();
+    if (!product) {
+      return { error: 'Could not find the product to add this variant to.' };
+    }
+    sku = buildVariantSku(product.sku, input.size, input.color);
   }
 
   const { data: variant, error } = await supabase
@@ -176,7 +218,7 @@ export async function addVariant(
       product_id: productId,
       size: input.size.trim(),
       color: input.color.trim(),
-      sku: input.sku.trim(),
+      sku,
       price_override: input.price_override,
     })
     .select()
