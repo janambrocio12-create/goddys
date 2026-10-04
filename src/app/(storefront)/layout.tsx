@@ -13,7 +13,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
 
   return (
     <TransitionProvider>
-      <CartProvider>
+      <CartProvider userId={user?.id ?? null}>
         <div className="flex min-h-screen flex-col">
         <header className="flex items-center justify-between border-b border-concrete/20 px-6 py-5 md:px-10">
           <Link href="/" className="font-display text-xl tracking-tightest">
