@@ -6,6 +6,7 @@ import { LogoutButton } from '@/components/storefront/logout-button';
 import { TransitionProvider } from '@/components/storefront/transition-provider';
 import { ThemeProvider } from '@/components/storefront/theme-provider';
 import { ThemeToggle } from '@/components/storefront/theme-toggle';
+import { MobileNav } from '@/components/storefront/mobile-nav';
 
 export default async function StorefrontLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -17,11 +18,12 @@ export default async function StorefrontLayout({ children }: { children: React.R
     <TransitionProvider>
       <CartProvider userId={user?.id ?? null}>
         <ThemeProvider>
-          <header className="flex items-center justify-between border-b border-concrete/20 px-6 py-5 md:px-10">
+          <header className="relative flex items-center justify-between border-b border-concrete/20 px-6 py-5 md:px-10">
           <Link href="/" className="font-display text-xl tracking-tightest">
             GODDYS
           </Link>
-          <nav className="flex items-center gap-6 font-mono text-xs uppercase tracking-wide text-concrete">
+
+          <nav className="hidden items-center gap-6 font-mono text-xs uppercase tracking-wide text-concrete md:flex">
             <Link href="/shop" className="hover:text-bone">
               Shop
             </Link>
@@ -42,6 +44,13 @@ export default async function StorefrontLayout({ children }: { children: React.R
             )}
             <ThemeToggle />
           </nav>
+
+          <div className="flex items-center gap-4 md:hidden">
+            <Link href="/cart" className="font-mono text-xs uppercase tracking-wide text-concrete hover:text-bone">
+              <CartBadge />
+            </Link>
+            <MobileNav isLoggedIn={!!user} />
+          </div>
         </header>
 
         <main className="flex-1">{children}</main>

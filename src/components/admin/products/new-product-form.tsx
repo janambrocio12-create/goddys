@@ -71,7 +71,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           <textarea name="description" rows={4} className={inputClass} />
         </label>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Price (PHP)</span>
             <input
@@ -89,7 +89,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>SKU</span>
             <input name="sku" required className={inputClass} placeholder="GDY-TEE-001" />
@@ -145,7 +145,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
           {variants.map((variant, index) => (
             <div
               key={index}
-              className="grid grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] gap-2 border border-concrete/20 bg-panel p-3"
+              className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] border border-concrete/20 bg-panel p-3"
             >
               <input
                 placeholder="Size (e.g. M)"

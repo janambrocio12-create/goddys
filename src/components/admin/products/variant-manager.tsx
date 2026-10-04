@@ -65,6 +65,7 @@ function StockAdjustRow({ productId, variantId }: { productId: string; variantId
       <input
         placeholder="Qty"
         type="number"
+        min={type === 'adjustment' ? undefined : 0}
         value={quantity}
         onChange={(e) => setQuantity(e.target.value)}
         className={`${inputClass} w-24`}
@@ -81,6 +82,11 @@ function StockAdjustRow({ productId, variantId }: { productId: string; variantId
         className={secondaryButtonClass}
         onClick={() => {
           setError(null);
+          const qty = Number(quantity);
+          if ((type === 'restock' || type === 'return') && qty < 0) {
+            setError('Restock and return quantities must be positive. Use Adjustment for a decrease.');
+            return;
+          }
           startTransition(async () => {
             const result = await adjustStock(
               productId,
@@ -272,7 +278,7 @@ export function VariantManager({
         </table>
       )}
 
-      <div className="mt-4 grid grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] gap-2 border border-concrete/20 bg-panel p-3">
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_1.4fr_1fr_1fr_auto] border border-concrete/20 bg-panel p-3">
         <input
           placeholder="Size"
           value={newVariant.size}

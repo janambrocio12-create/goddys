@@ -1,19 +1,30 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 
-export default async function CustomersListPage() {
+const PAGE_SIZE = 20;
+
+export default async function CustomersListPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   const supabase = createClient();
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
 
-  const { data: customers, error } = await supabase
+  const { data: customers, error, count } = await supabase
     .from('customers')
-    .select('id, full_name, email, phone, created_at')
-    .order('created_at', { ascending: false });
+    .select('id, full_name, email, phone, created_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   return (
     <div>
       <h1 className="font-display text-2xl tracking-tightest">Customers</h1>
       <p className="mt-1 text-sm text-concrete">
-        {customers?.length ?? 0} customer{customers?.length === 1 ? '' : 's'}.
+        {count ?? 0} customer{count === 1 ? '' : 's'}.
       </p>
 
       {error && (
@@ -71,6 +82,13 @@ export default async function CustomersListPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        totalCount={count ?? 0}
+        basePath="/admin/customers"
+      />
     </div>
   );
 }

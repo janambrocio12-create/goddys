@@ -106,7 +106,7 @@ export function CheckoutForm({
           Shipping address
         </p>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="font-mono text-xs uppercase tracking-wide text-concrete">
               Full name
@@ -156,7 +156,7 @@ export function CheckoutForm({
           />
         </label>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="font-mono text-xs uppercase tracking-wide text-concrete">City</span>
             <input
@@ -179,7 +179,7 @@ export function CheckoutForm({
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="font-mono text-xs uppercase tracking-wide text-concrete">
               Postal code

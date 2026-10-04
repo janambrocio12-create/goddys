@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { AdminPagination } from '@/components/admin/admin-pagination';
+
+const PAGE_SIZE = 20;
 
 function formatMoney(value: number) {
   return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value);
@@ -11,17 +14,26 @@ const STATUS_STYLES: Record<string, string> = {
   archived: 'text-danger border-danger',
 };
 
-export default async function ProductsListPage() {
+export default async function ProductsListPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   const supabase = createClient();
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
 
-  const { data: products, error } = await supabase
+  const { data: products, error, count } = await supabase
     .from('products')
     .select(
       `id, name, sku, price, sale_price, status, is_featured, is_new_arrival,
        categories ( name ),
        product_variants ( stock_quantity )`,
+      { count: 'exact' },
     )
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(from, to);
 
   return (
     <div>
@@ -29,7 +41,7 @@ export default async function ProductsListPage() {
         <div>
           <h1 className="font-display text-2xl tracking-tightest">Products</h1>
           <p className="mt-1 text-sm text-concrete">
-            {products?.length ?? 0} product{products?.length === 1 ? '' : 's'} in the catalog.
+            {count ?? 0} product{count === 1 ? '' : 's'} in the catalog.
           </p>
         </div>
         <Link
@@ -122,6 +134,13 @@ export default async function ProductsListPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        totalCount={count ?? 0}
+        basePath="/admin/products"
+      />
     </div>
   );
 }

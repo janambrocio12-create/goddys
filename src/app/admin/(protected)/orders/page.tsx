@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { formatMoney } from '@/lib/format';
+import { AdminPagination } from '@/components/admin/admin-pagination';
 import type { OrderStatus } from '@/lib/types/database.types';
+
+const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: (OrderStatus | 'all')[] = [
   'all',
@@ -25,27 +28,33 @@ const STATUS_STYLES: Record<string, string> = {
 export default async function OrdersListPage({
   searchParams,
 }: {
-  searchParams: { status?: string; customer?: string };
+  searchParams: { status?: string; customer?: string; page?: string };
 }) {
   const supabase = createClient();
   const statusFilter = searchParams.status as OrderStatus | undefined;
   const customerFilter = searchParams.customer;
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
 
   let query = supabase
     .from('orders')
-    .select('id, order_number, status, payment_status, total_amount, created_at, customers ( id, full_name, email )')
+    .select(
+      'id, order_number, status, payment_status, total_amount, created_at, customers ( id, full_name, email )',
+      { count: 'exact' },
+    )
     .order('created_at', { ascending: false });
 
   if (statusFilter) query = query.eq('status', statusFilter);
   if (customerFilter) query = query.eq('customer_id', customerFilter);
 
-  const { data: orders, error } = await query;
+  const { data: orders, error, count } = await query.range(from, to);
 
   return (
     <div>
       <h1 className="font-display text-2xl tracking-tightest">Orders</h1>
       <p className="mt-1 text-sm text-concrete">
-        {orders?.length ?? 0} order{orders?.length === 1 ? '' : 's'}
+        {count ?? 0} order{count === 1 ? '' : 's'}
         {customerFilter ? ' for this customer' : ''}.
       </p>
 
@@ -154,6 +163,14 @@ export default async function OrdersListPage({
           </table>
         </div>
       )}
+
+      <AdminPagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        totalCount={count ?? 0}
+        basePath="/admin/orders"
+        searchParams={{ status: statusFilter, customer: customerFilter }}
+      />
     </div>
   );
 }

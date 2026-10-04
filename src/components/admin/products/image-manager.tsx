@@ -2,7 +2,11 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { addProductImage, deleteProductImage } from '@/app/admin/(protected)/products/actions';
+import {
+  addProductImage,
+  deleteProductImage,
+  setPrimaryImage,
+} from '@/app/admin/(protected)/products/actions';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/upload-image';
 import { ghostButtonClass, inputClass, primaryButtonClass } from '@/components/admin/form-styles';
 
@@ -70,6 +74,17 @@ export function ImageManager({
     });
   }
 
+  function makePrimary(imageId: string) {
+    startTransition(async () => {
+      const result = await setPrimaryImage(productId, imageId);
+      if (result && 'error' in result) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
   return (
     <div>
       {images.length === 0 ? (
@@ -88,11 +103,20 @@ export function ImageManager({
                 alt={image.alt_text ?? ''}
                 className="aspect-square w-full object-cover"
               />
-              <div className="mt-2 flex items-center justify-between">
-                {image.is_primary && (
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-1">
+                {image.is_primary ? (
                   <span className="font-mono text-[10px] uppercase tracking-wide text-hazard">
                     Primary
                   </span>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => makePrimary(image.id)}
+                    className={ghostButtonClass}
+                  >
+                    Set as primary
+                  </button>
                 )}
                 <button
                   type="button"

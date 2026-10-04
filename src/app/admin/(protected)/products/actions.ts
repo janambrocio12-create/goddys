@@ -259,6 +259,10 @@ export async function adjustStock(
     return { error: 'Enter a non-zero quantity.' };
   }
 
+  if ((movementType === 'restock' || movementType === 'return') && quantityChange < 0) {
+    return { error: 'Restock and return quantities must be positive. Use Adjustment for a decrease.' };
+  }
+
   const { error } = await supabase.from('inventory_movements').insert({
     variant_id: variantId,
     movement_type: movementType,
@@ -294,6 +298,34 @@ export async function addProductImage(
 
   if (error) {
     return { error: error.message };
+  }
+
+  revalidatePath(`/admin/products/${productId}`);
+  return { success: true };
+}
+
+/** Makes one image the product's primary (listing/thumbnail) image and
+ * demotes any other image that was previously marked primary. */
+export async function setPrimaryImage(productId: string, imageId: string): Promise<ActionResult> {
+  const supabase = createClient();
+
+  const { error: demoteError } = await supabase
+    .from('product_images')
+    .update({ is_primary: false })
+    .eq('product_id', productId)
+    .eq('is_primary', true);
+
+  if (demoteError) {
+    return { error: demoteError.message };
+  }
+
+  const { error: promoteError } = await supabase
+    .from('product_images')
+    .update({ is_primary: true })
+    .eq('id', imageId);
+
+  if (promoteError) {
+    return { error: promoteError.message };
   }
 
   revalidatePath(`/admin/products/${productId}`);
