@@ -11,10 +11,49 @@ export default function ContactPage() {
 
       <div className="mt-8 flex flex-col gap-3 font-mono text-sm">
         <p className="text-concrete">
-          Email: <span className="text-bone">hello@goddys.example</span>
+          Email:{' '}
+          <a href="mailto:goddysclothing@gmail.com" className="text-bone hover:text-hazard">
+            goddysclothing@gmail.com
+          </a>
         </p>
         <p className="text-concrete">
-          Instagram: <span className="text-bone">@goddys.ph</span>
+          Phone:{' '}
+          <a href="tel:+639955286273" className="text-bone hover:text-hazard">
+            0995 528 6273
+          </a>
+        </p>
+        <p className="text-concrete">
+          Facebook:{' '}
+          <a
+            href="https://www.facebook.com/share/1BwY264zJN/?mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-bone hover:text-hazard"
+          >
+            GODDYS on Facebook
+          </a>
+        </p>
+        <p className="text-concrete">
+          Instagram:{' '}
+          <a
+            href="https://www.instagram.com/goddysph?stkn=MXZoNDdwODZ4OWM3Yw%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-bone hover:text-hazard"
+          >
+            @goddysph
+          </a>
+        </p>
+        <p className="text-concrete">
+          TikTok:{' '}
+          <a
+            href="https://www.tiktok.com/@goddys_apparel?_r=1&_t=ZS-9AHD41NUxYD"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-bone hover:text-hazard"
+          >
+            @goddys_apparel
+          </a>
         </p>
       </div>
     </div>

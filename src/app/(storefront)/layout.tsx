@@ -109,6 +109,36 @@ export default async function StorefrontLayout({ children }: { children: React.R
                     About
                   </Link>
                 </li>
+                <li>
+                  <a
+                    href="https://www.facebook.com/share/1BwY264zJN/?mibextid=wwXIfr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-hazard"
+                  >
+                    Facebook
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.instagram.com/goddysph?stkn=MXZoNDdwODZ4OWM3Yw%3D%3D&utm_source=qr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-hazard"
+                  >
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.tiktok.com/@goddys_apparel?_r=1&_t=ZS-9AHD41NUxYD"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-hazard"
+                  >
+                    TikTok
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
