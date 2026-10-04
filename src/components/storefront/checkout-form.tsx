@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart/cart-context';
 import { formatMoney } from '@/lib/format';
@@ -9,9 +10,9 @@ import type { PaymentMethod } from '@/lib/types/database.types';
 
 // No payment gateway account yet, so this is the interim setup: cash on
 // delivery, or a manual GCash transfer the client verifies by eye.
-// Replace these with the real GCash number and account name before launch.
-const GCASH_NUMBER = '09XX XXX XXXX';
-const GCASH_ACCOUNT_NAME = 'GODDYS PH (placeholder - swap in the real name)';
+const GCASH_NUMBER = '0995 528 6273';
+const GCASH_ACCOUNT_NAME = 'Miguel Armildez';
+const GCASH_QR_IMAGE = '/images/gcash-qr.jpg';
 
 const EMPTY_ADDRESS: CheckoutAddressInput = {
   full_name: '',
@@ -227,14 +228,25 @@ export function CheckoutForm({
           {paymentMethod === 'gcash_manual' && (
             <div className="flex flex-col gap-3 border border-hazard/40 bg-panel p-4">
               <p className="text-sm text-bone">
-                Send the total below to GCash, then drop the reference number here so we
-                can confirm it and get your order moving.
+                Scan the QR or send straight to the number below, then drop the reference
+                number here so we can confirm it and get your order moving.
               </p>
-              <p className="font-mono text-xs text-concrete">
-                GCash number: <span className="text-hazard">{GCASH_NUMBER}</span>
-                <br />
-                Account name: <span className="text-hazard">{GCASH_ACCOUNT_NAME}</span>
-              </p>
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                <div className="w-32 shrink-0 overflow-hidden border border-concrete/30 bg-bone">
+                  <Image
+                    src={GCASH_QR_IMAGE}
+                    alt="GODDYS GCash QR code"
+                    width={300}
+                    height={333}
+                    className="h-auto w-full"
+                  />
+                </div>
+                <p className="font-mono text-xs text-concrete">
+                  GCash number: <span className="text-hazard">{GCASH_NUMBER}</span>
+                  <br />
+                  Account name: <span className="text-hazard">{GCASH_ACCOUNT_NAME}</span>
+                </p>
+              </div>
               <label className="flex flex-col gap-1.5">
                 <span className="font-mono text-xs uppercase tracking-wide text-concrete">
                   GCash reference number
