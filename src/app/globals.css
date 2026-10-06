@@ -94,7 +94,7 @@
 /* Wide screens: full-bleed photo, framed on the models' faces with the
    dark sky above them left free for the logo. */
 .hero-photo {
-  background: url('/images/hero-desktop.jpg') 50% 30% / cover no-repeat;
+  background: url('/images/hero-desktop.jpg') 50% 38% / cover no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {
