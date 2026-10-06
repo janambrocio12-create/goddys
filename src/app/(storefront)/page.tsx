@@ -1,31 +1,27 @@
 import { ShopNowButton } from '@/components/storefront/shop-now-button';
-import { HeroBackground } from '@/components/storefront/hero-background';
+import { HeroVideo } from '@/components/storefront/hero-video';
+import { HeroLogo } from '@/components/storefront/hero-logo';
 
 export default function HomePage() {
   return (
-    <section className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 md:px-10">
-      <HeroBackground />
+    // Always dark: the background is a video, so the logo and button need
+    // the dark palette in both themes to stay readable over it.
+    <section
+      data-theme="dark"
+      className="relative flex min-h-[calc(100svh-4.5rem)] flex-col items-center justify-center overflow-hidden bg-ink px-6"
+    >
+      <HeroVideo />
 
-      <div className="relative mx-auto w-full max-w-7xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-hazard">
-          Built different - Bataan
-        </p>
+      <h1 className="sr-only">GODDYS</h1>
 
-        <h1 className="mt-4 font-display text-[clamp(3rem,14vw,8rem)] leading-[0.85] tracking-tightest drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
-          GODDYS
-        </h1>
+      {/* Sits in the dark sky above the models rather than dead center, so
+          it never covers their faces or the shirts. */}
+      <div className="absolute inset-x-0 top-[24%] flex md:top-[9%] justify-center px-6">
+        <HeroLogo />
+      </div>
 
-        <p className="mt-6 max-w-md font-body text-sm text-bone md:text-base">
-          Loyalty over hype - heavyweight fits, no cap.
-        </p>
-
-        <p className="mt-3 font-mono text-xs uppercase tracking-widest text-concrete">
-          Loyalty · Discipline · Ambition
-        </p>
-
-        <div className="mt-10">
-          <ShopNowButton />
-        </div>
+      <div className="absolute inset-x-0 bottom-[9%] flex justify-center">
+        <ShopNowButton />
       </div>
     </section>
   );
