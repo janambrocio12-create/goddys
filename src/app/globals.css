@@ -91,18 +91,10 @@
   background-image: url('/videos/hero-poster.jpg');
 }
 
-/* Wide screens: the portrait video becomes a centered full-height
-   column whose edges fade into the blurred backdrop. */
-@media (min-width: 768px) {
-  .hero-video-column {
-    left: 50%;
-    right: auto;
-    width: auto;
-    aspect-ratio: 9 / 16;
-    transform: translateX(-50%);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
-  }
+/* Wide screens: full-bleed photo, framed on the models' faces with the
+   dark sky above them left free for the logo. */
+.hero-photo {
+  background: url('/images/hero-desktop.jpg') 50% 30% / cover no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {

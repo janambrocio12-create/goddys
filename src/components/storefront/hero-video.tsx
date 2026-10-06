@@ -3,18 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 const MOBILE_SRC = '/videos/hero-mobile.mp4';
-const DESKTOP_SRC = '/videos/hero-desktop.mp4';
 
 /**
- * Looping background video for the home hero. The footage is portrait, so
- * on phones it simply fills the screen, while on wider screens it sits as
- * a centered full-height column over a blurred copy of its own first frame
- * (instead of being zoomed in and cropped to a thin strip of the models).
+ * Home hero background. On phones it is a looping portrait video that fills
+ * the screen. On wider screens it is a full-bleed photo instead (no video is
+ * downloaded there), framed so the models' faces stay in view.
  *
- * The first frame shows immediately as a still, and the video fades in once
- * it can actually play, so a slow connection never shows an empty frame.
- * Hidden for people who prefer reduced motion (see globals.css), who just
- * keep the still.
+ * On phones the first frame shows immediately as a still, and the video fades
+ * in once it can actually play, so a slow connection never shows an empty
+ * frame. Reduced-motion visitors keep the still (see globals.css).
  */
 export function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -24,10 +21,9 @@ export function HeroVideo() {
     const video = videoRef.current;
     if (!video) return;
 
-    // Smaller file for phones, sharper one for desktop. Chosen here rather
-    // than in markup so a phone never downloads the big one.
-    const isWide = window.matchMedia('(min-width: 768px)').matches;
-    video.src = isWide ? DESKTOP_SRC : MOBILE_SRC;
+    // Wide screens use the photo, so only phones load the video.
+    if (window.matchMedia('(min-width: 768px)').matches) return;
+    video.src = MOBILE_SRC;
 
     // React doesn't render `muted` into the server HTML, and browsers only
     // allow autoplay for muted video - so set it and start playback here.
@@ -37,10 +33,11 @@ export function HeroVideo() {
 
   return (
     <>
-      <div className="hero-still absolute inset-0 bg-cover bg-center md:scale-110 md:opacity-60 md:blur-2xl" />
+      <div className="hero-still absolute inset-0 bg-cover bg-center md:hidden" />
+      <div className="hero-photo absolute inset-0 hidden md:block" />
       <video
         ref={videoRef}
-        className={`hero-video hero-video-column absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+        className={`hero-video absolute inset-0 h-full w-full object-cover md:hidden transition-opacity duration-700 ${
           ready ? 'opacity-100' : 'opacity-0'
         }`}
         autoPlay
