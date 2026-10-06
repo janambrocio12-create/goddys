@@ -62,7 +62,7 @@
    (dimmed copies between a front and a back face) so it reads as a solid
    object with an edge while it rotates, instead of a paper-thin card. */
 .hero-logo-stage {
-  width: min(78vw, 620px);
+  width: min(62vw, 520px);
   aspect-ratio: 1600 / 562;
   perspective: 1400px;
   filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
@@ -72,7 +72,7 @@
    in the sky area, clear of the models faces. */
 @media (min-width: 768px) {
   .hero-logo-stage {
-    width: min(34vw, 400px);
+    width: min(26vw, 320px);
   }
 }
 
