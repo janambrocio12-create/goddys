@@ -88,11 +88,11 @@
 /* Hero photo: smaller file on phones, framed on the models' faces on
    wide screens with the dark sky above them left free for the logo. */
 .hero-photo {
-  background: url('/images/hero-mobile.jpg') 50% 50% / cover no-repeat;
+  background: #000 url('/images/hero-mobile.jpg') 50% 100% / 125% auto no-repeat;
 }
 
 @media (min-width: 768px) {
   .hero-photo {
-    background: url('/images/hero-desktop.jpg') 50% 38% / cover no-repeat;
+    background: #000 url('/images/hero-desktop.jpg') 50% 38% / cover no-repeat;
   }
 }
