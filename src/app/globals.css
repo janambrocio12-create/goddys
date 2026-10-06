@@ -85,20 +85,14 @@
   }
 }
 
-/* First frame of the hero video, shown straight away and as the
-   blurred backdrop beside the video column on wide screens. */
-.hero-still {
-  background-image: url('/videos/hero-poster.jpg');
-}
-
-/* Wide screens: full-bleed photo, framed on the models' faces with the
-   dark sky above them left free for the logo. */
+/* Hero photo: smaller file on phones, framed on the models' faces on
+   wide screens with the dark sky above them left free for the logo. */
 .hero-photo {
-  background: url('/images/hero-desktop.jpg') 50% 38% / cover no-repeat;
+  background: url('/images/hero-mobile.jpg') 50% 50% / cover no-repeat;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-video {
-    display: none;
+@media (min-width: 768px) {
+  .hero-photo {
+    background: url('/images/hero-desktop.jpg') 50% 38% / cover no-repeat;
   }
 }
