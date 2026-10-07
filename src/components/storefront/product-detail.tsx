@@ -57,6 +57,7 @@ export function ProductDetail({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const galleryImages = useMemo(
     () => images.filter((img) => !img.variant_id || img.variant_id === selectedVariant?.id),
@@ -122,7 +123,20 @@ export function ProductDetail({
   return (
     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-10 md:grid-cols-2 md:px-10">
       <div>
-        <div className="relative aspect-square w-full overflow-hidden bg-panel">
+        {/* No frame color, and object-contain so uploads are never cropped.
+            On phones, swipe left/right to flip between photos. */}
+        <div
+          className="relative aspect-square w-full overflow-hidden"
+          onTouchStart={(e) => setTouchStartX(e.touches[0]?.clientX ?? null)}
+          onTouchEnd={(e) => {
+            if (touchStartX === null || galleryImages.length < 2) return;
+            const deltaX = (e.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+            setTouchStartX(null);
+            if (Math.abs(deltaX) < 40) return;
+            const count = galleryImages.length;
+            setActiveImageIndex((i) => (deltaX < 0 ? (i + 1) % count : (i - 1 + count) % count));
+          }}
+        >
           {activeImage ? (
             <button
               type="button"
@@ -135,7 +149,7 @@ export function ProductDetail({
               <img
                 src={activeImage.url}
                 alt={activeImage.alt_text ?? product.name}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
               <span
                 data-theme="dark"
@@ -145,7 +159,7 @@ export function ProductDetail({
               </span>
             </button>
           ) : (
-            <div className="flex h-full w-full items-center justify-center font-mono text-[10px] uppercase tracking-widest text-concrete">
+            <div className="flex h-full w-full items-center justify-center border border-concrete/20 font-mono text-[10px] uppercase tracking-widest text-concrete">
               No image
             </div>
           )}
@@ -162,7 +176,7 @@ export function ProductDetail({
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt="" className="h-full w-full object-cover" />
+                <img src={img.url} alt="" className="h-full w-full object-contain" />
               </button>
             ))}
           </div>

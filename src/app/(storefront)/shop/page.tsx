@@ -10,7 +10,7 @@ export default async function ShopPage({
   const supabase = createClient();
   const activeCategory = searchParams.category;
   const productColumns =
-    'id, name, slug, price, sale_price, product_images ( url, is_primary ), product_variants ( size )';
+    'id, name, slug, price, sale_price, product_images ( url, is_primary, display_order ), product_variants ( size )';
 
   const { data: categories } = await supabase
     .from('categories')
