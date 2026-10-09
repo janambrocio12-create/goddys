@@ -6,31 +6,66 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart/cart-context';
 import { formatMoney } from '@/lib/format';
 import { placeOrder, type CheckoutAddressInput } from '@/app/(storefront)/checkout/actions';
+import { SHIPPING_FEE } from '@/lib/payment';
 
 // No payment gateway account yet, so this is the interim setup: a manual
-// e-wallet transfer (GCash or PayMaya) the client verifies by eye. Both
-// wallets land in the same account, just different apps - so same number
-// and name, different QR per app. Cash on delivery used to be a third
-// option here but the client dropped it - orders placed with it before
-// still display fine (see order-confirmation and admin), it's just gone
-// from checkout going forward.
+// transfer (GCash, PayMaya, or BDO) the client verifies by eye. GCash and
+// PayMaya land in the same e-wallet account, just different apps - so
+// same number and name, different QR per app. BDO is a separate bank
+// account. Cash on delivery used to be an option here but the client
+// dropped it - orders placed with it before still display fine (see
+// order-confirmation and admin), it's just gone from checkout going forward.
 const WALLET_ACCOUNT_NUMBER = '0995 528 6273';
 const WALLET_ACCOUNT_NAME = 'Miguel Armildez';
 
-type WalletMethod = 'gcash_manual' | 'paymaya_manual';
+type WalletMethod = 'gcash_manual' | 'paymaya_manual' | 'bdo_manual';
 
-const WALLET_CONFIG: Record<WalletMethod, { label: string; qrImage: string; qrAlt: string }> = {
+const WALLET_CONFIG: Record<
+  WalletMethod,
+  {
+    label: string;
+    numberLabel: string;
+    accountNumber: string;
+    accountName: string;
+    qrImage: string;
+    qrWidth: number;
+    qrHeight: number;
+    qrAlt: string;
+  }
+> = {
   gcash_manual: {
     label: 'GCash',
+    numberLabel: 'GCash number',
+    accountNumber: WALLET_ACCOUNT_NUMBER,
+    accountName: WALLET_ACCOUNT_NAME,
     qrImage: '/images/gcash-qr.jpg',
+    qrWidth: 668,
+    qrHeight: 741,
     qrAlt: 'GODDYS GCash QR code',
   },
   paymaya_manual: {
     label: 'PayMaya',
+    numberLabel: 'PayMaya number',
+    accountNumber: WALLET_ACCOUNT_NUMBER,
+    accountName: WALLET_ACCOUNT_NAME,
     qrImage: '/images/paymaya-qr.jpg',
+    qrWidth: 886,
+    qrHeight: 853,
     qrAlt: 'GODDYS PayMaya QR code',
   },
+  bdo_manual: {
+    label: 'BDO',
+    numberLabel: 'BDO account number',
+    accountNumber: '0052 5050 9070',
+    accountName: 'Mepol Salandanan',
+    qrImage: '/images/bdo-qr.jpg',
+    qrWidth: 800,
+    qrHeight: 1153,
+    qrAlt: 'GODDYS BDO QR code',
+  },
 };
+
+const WALLET_METHODS = Object.keys(WALLET_CONFIG) as WalletMethod[];
 
 const EMPTY_ADDRESS: CheckoutAddressInput = {
   full_name: '',
@@ -218,29 +253,21 @@ export function CheckoutForm({
         <div className="mt-2 flex flex-col gap-3 border-t border-concrete/20 pt-4">
           <p className="font-mono text-xs uppercase tracking-widest text-concrete">Payment</p>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('gcash_manual')}
-              className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
-                paymentMethod === 'gcash_manual'
-                  ? 'border-bone bg-bone text-ink'
-                  : 'border-concrete/40 text-bone hover:border-bone'
-              }`}
-            >
-              GCash
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('paymaya_manual')}
-              className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
-                paymentMethod === 'paymaya_manual'
-                  ? 'border-bone bg-bone text-ink'
-                  : 'border-concrete/40 text-bone hover:border-bone'
-              }`}
-            >
-              PayMaya
-            </button>
+          <div className="grid grid-cols-3 gap-3">
+            {WALLET_METHODS.map((method) => (
+              <button
+                key={method}
+                type="button"
+                onClick={() => setPaymentMethod(method)}
+                className={`border px-3 py-3 text-left font-mono text-xs uppercase tracking-wide ${
+                  paymentMethod === method
+                    ? 'border-bone bg-bone text-ink'
+                    : 'border-concrete/40 text-bone hover:border-bone'
+                }`}
+              >
+                {WALLET_CONFIG[method].label}
+              </button>
+            ))}
           </div>
 
           <div className="flex flex-col gap-3 border border-hazard/40 bg-panel p-4">
@@ -253,16 +280,17 @@ export function CheckoutForm({
                 <Image
                   src={WALLET_CONFIG[paymentMethod].qrImage}
                   alt={WALLET_CONFIG[paymentMethod].qrAlt}
-                  width={300}
-                  height={333}
+                  width={WALLET_CONFIG[paymentMethod].qrWidth}
+                  height={WALLET_CONFIG[paymentMethod].qrHeight}
                   className="h-auto w-full"
                 />
               </div>
               <p className="font-mono text-xs text-concrete">
-                {WALLET_CONFIG[paymentMethod].label} number:{' '}
-                <span className="text-hazard">{WALLET_ACCOUNT_NUMBER}</span>
+                {WALLET_CONFIG[paymentMethod].numberLabel}:{' '}
+                <span className="text-hazard">{WALLET_CONFIG[paymentMethod].accountNumber}</span>
                 <br />
-                Account name: <span className="text-hazard">{WALLET_ACCOUNT_NAME}</span>
+                Account name:{' '}
+                <span className="text-hazard">{WALLET_CONFIG[paymentMethod].accountName}</span>
               </p>
             </div>
             <label className="flex flex-col gap-1.5">
@@ -317,12 +345,22 @@ export function CheckoutForm({
             </div>
           ))}
         </div>
-        <div className="mt-4 flex justify-between border-t border-concrete/20 pt-4 font-mono">
-          <span className="text-xs uppercase tracking-widest text-concrete">Subtotal</span>
-          <span>{formatMoney(subtotal)}</span>
+        <div className="mt-4 flex flex-col gap-1 border-t border-concrete/20 pt-4 font-mono text-sm text-concrete">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>{formatMoney(subtotal)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Shipping</span>
+            <span>{formatMoney(SHIPPING_FEE)}</span>
+          </div>
+        </div>
+        <div className="mt-3 flex justify-between border-t border-concrete/20 pt-4 font-mono">
+          <span className="text-xs uppercase tracking-widest text-concrete">Total</span>
+          <span className="text-lg">{formatMoney(subtotal + SHIPPING_FEE)}</span>
         </div>
         <p className="mt-2 font-mono text-[10px] text-concrete">
-          Discounts and shipping are applied when the order is placed.
+          Discount codes are applied when the order is placed.
         </p>
       </div>
     </div>

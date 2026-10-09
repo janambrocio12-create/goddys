@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { formatMoney } from '@/lib/format';
+import { paymentMethodLabel } from '@/lib/payment';
 import type { OrderStatus } from '@/lib/types/database.types';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
@@ -65,11 +66,7 @@ export default async function CustomerOrdersPage() {
                     day: 'numeric',
                   })}
                   {' · '}
-                  {order.payment_method === 'gcash_manual'
-                    ? 'GCash'
-                    : order.payment_method === 'paymaya_manual'
-                      ? 'PayMaya'
-                      : 'Cash on delivery'}
+                  {paymentMethodLabel(order.payment_method)}
                   {' · '}
                   {order.payment_status.replace('_', ' ')}
                 </p>

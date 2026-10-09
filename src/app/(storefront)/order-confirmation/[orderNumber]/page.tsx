@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { formatMoney } from '@/lib/format';
+import { PAYMENT_METHOD_LABELS } from '@/lib/payment';
 import type { Address } from '@/lib/types/database.types';
 
 export default async function OrderConfirmationPage({
@@ -27,12 +28,7 @@ export default async function OrderConfirmationPage({
 
   const shippingAddress = order.shipping_address as Address;
 
-  const walletLabel =
-    order.payment_method === 'gcash_manual'
-      ? 'GCash'
-      : order.payment_method === 'paymaya_manual'
-        ? 'PayMaya'
-        : null;
+  const walletLabel = PAYMENT_METHOD_LABELS[order.payment_method];
 
   const paymentNote = walletLabel
     ? order.payment_status === 'paid'
@@ -84,7 +80,24 @@ export default async function OrderConfirmationPage({
         })}
       </div>
 
-      <div className="mt-4 flex justify-between border-t border-concrete/20 pt-4 font-mono">
+      <div className="mt-4 flex flex-col gap-1 border-t border-concrete/20 pt-4 font-mono text-sm text-concrete">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>{formatMoney(order.subtotal)}</span>
+        </div>
+        {order.discount_amount > 0 && (
+          <div className="flex justify-between text-hazard">
+            <span>Discount</span>
+            <span>−{formatMoney(order.discount_amount)}</span>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span>{formatMoney(order.shipping_amount)}</span>
+        </div>
+      </div>
+
+      <div className="mt-3 flex justify-between border-t border-concrete/20 pt-4 font-mono">
         <span className="text-xs uppercase tracking-widest text-concrete">Total</span>
         <span className="text-lg">{formatMoney(order.total_amount)}</span>
       </div>

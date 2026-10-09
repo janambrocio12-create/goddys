@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { formatMoney } from '@/lib/format';
+import { PAYMENT_METHOD_LABELS } from '@/lib/payment';
 import { OrderStatusControls } from '@/components/admin/orders/order-status-controls';
 import type { Address } from '@/lib/types/database.types';
 
@@ -96,17 +97,17 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               Payment method
             </p>
             <p className="mt-2 text-sm">
-              {order.payment_method === 'gcash_manual'
-                ? 'GCash (manual)'
-                : order.payment_method === 'paymaya_manual'
-                  ? 'PayMaya (manual)'
-                  : 'Cash on delivery'}
+              {PAYMENT_METHOD_LABELS[order.payment_method]
+                ? `${PAYMENT_METHOD_LABELS[order.payment_method]} (manual)`
+                : 'Cash on delivery'}
             </p>
-            {(order.payment_method === 'gcash_manual' || order.payment_method === 'paymaya_manual') && (
+            {PAYMENT_METHOD_LABELS[order.payment_method] && (
               <p className="mt-1 font-mono text-xs text-hazard">
                 Reference: {order.payment_reference ?? '-'} - check the{' '}
-                {order.payment_method === 'gcash_manual' ? 'GCash' : 'PayMaya'} app before marking
-                this paid.
+                {order.payment_method === 'bdo_manual'
+                  ? 'BDO account'
+                  : `${PAYMENT_METHOD_LABELS[order.payment_method]} app`}{' '}
+                before marking this paid.
               </p>
             )}
           </div>

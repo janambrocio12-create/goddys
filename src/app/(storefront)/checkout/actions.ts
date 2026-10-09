@@ -45,7 +45,7 @@ export async function placeOrder(
   // form itself never sends 'cod' anymore, but this catches a direct call
   // (API abuse, a stale client, etc) instead of trusting the input.
   if (paymentMethod === 'cod') {
-    return { success: false, error: 'Cash on delivery is not available - choose GCash or PayMaya.' };
+    return { success: false, error: 'Cash on delivery is not available - choose GCash, PayMaya, or BDO.' };
   }
 
   if (paymentReference.trim().length === 0) {

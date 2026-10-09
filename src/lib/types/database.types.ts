@@ -15,7 +15,7 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded';
 export type PaymentStatus = 'unpaid' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
-export type PaymentMethod = 'cod' | 'gcash_manual' | 'paymaya_manual';
+export type PaymentMethod = 'cod' | 'gcash_manual' | 'paymaya_manual' | 'bdo_manual';
 export type AdminRole = 'super_admin' | 'admin' | 'manager' | 'staff';
 export type DiscountType = 'percentage' | 'fixed_amount';
 export type InventoryMovementType =
