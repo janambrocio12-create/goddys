@@ -60,7 +60,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
             <div className="col-span-2 md:col-span-1">
               <p className="font-display text-lg tracking-tightest">GODDYS</p>
               <p className="mt-2 font-mono text-xs text-concrete">
-                Premium streetwear, built underground.
+                Made to stand out. Built to be worn.
               </p>
             </div>
 
