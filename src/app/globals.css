@@ -58,13 +58,11 @@
   }
 }
 
-/* Home hero logo: flat, with a slow, gentle float. */
+/* Home hero logo: a spinning 3D logo (see hero-logo.tsx). */
 .hero-logo-stage {
   width: min(52vw, 440px);
-  aspect-ratio: 1600 / 562;
-  background: url('/images/goddys-logo.png') center / contain no-repeat;
+  aspect-ratio: 800 / 296;
   filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
-  animation: hero-logo-float 5s ease-in-out infinite;
 }
 
 /* On desktop the video is a centered column, so keep the logo small and high
@@ -72,16 +70,6 @@
 @media (min-width: 768px) {
   .hero-logo-stage {
     width: min(22vw, 270px);
-  }
-}
-
-@keyframes hero-logo-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
   }
 }
 

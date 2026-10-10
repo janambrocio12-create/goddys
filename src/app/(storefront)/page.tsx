@@ -16,7 +16,7 @@ export default function HomePage() {
 
       {/* Sits in the dark sky above the models rather than dead center, so
           it never covers their faces or the shirts. */}
-      <div className="absolute inset-x-0 top-[17%] flex md:top-[13%] justify-center px-6">
+      <div className="absolute inset-x-0 top-[7%] flex md:top-[4%] justify-center px-6">
         <HeroLogo />
       </div>
 
