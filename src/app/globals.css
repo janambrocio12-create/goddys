@@ -58,10 +58,16 @@
   }
 }
 
-/* Home hero logo: a spinning 3D logo (see hero-logo.tsx). */
+/* Home hero logo: a spinning 3D logo (see hero-logo.tsx). The video frame
+   leaves room around the logo for the spin, so at rest the logo only fills
+   ~86% of the stage's width and sits a little left and below its top edge.
+   The width is scaled up and the stage nudged to match the old flat logo's
+   size and position exactly. */
 .hero-logo-stage {
-  width: min(52vw, 440px);
+  width: min(60vw, 509px);
   aspect-ratio: 800 / 296;
+  margin-top: -2.55vw;
+  transform: translateX(5.5%);
   filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
 }
 
@@ -69,7 +75,8 @@
    in the sky area, clear of the models faces. */
 @media (min-width: 768px) {
   .hero-logo-stage {
-    width: min(22vw, 270px);
+    width: min(25.4vw, 312px);
+    margin-top: -13px;
   }
 }
 
